@@ -3,6 +3,7 @@ import 'package:responsive_app/responsive/desktop_scaffold.dart';
 import 'package:responsive_app/responsive/mobile_scaffold.dart';
 import 'package:responsive_app/responsive/reponsive_layout.dart';
 import 'package:responsive_app/responsive/tablet_scaffold.dart';
+import 'package:responsive_app/shared/app_colors.dart';
 
 void main() {
   runApp(const MainApp());
@@ -13,9 +14,19 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: ResponsiveLayout(
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: AppColors.background,
+        primaryColor: AppColors.gold,
+        colorScheme: ColorScheme.dark(
+          primary: AppColors.gold,
+          background: AppColors.background,
+          surface: AppColors.panel,
+        ),
+      ),
+      home: const ResponsiveLayout(
         mobileScaffold: MobileScaffold(),
         tabletScaffold: TabletScaffold(),
         desktopScaffold: DesktopScaffold(),
@@ -23,3 +34,4 @@ class MainApp extends StatelessWidget {
     );
   }
 }
+

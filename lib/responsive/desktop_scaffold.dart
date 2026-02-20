@@ -23,13 +23,6 @@ class DesktopScaffold extends StatelessWidget {
           ),
         ),
         centerTitle: true,
-        actions: [
-          ExtendAppBarButton(text: 'Para Llevar', onPress: () {}),
-          ExtendAppBarButton(text: 'Mesas', onPress: () {}),
-          ExtendAppBarButton(text: 'Barra', onPress: () {}),
-          ExtendAppBarButton(text: 'Delivery', onPress: () {}),
-          const SizedBox(width: 20),
-        ],
       ),
       body: const LandingPage(),
     );
