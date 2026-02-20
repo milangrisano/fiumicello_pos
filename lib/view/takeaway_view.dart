@@ -152,7 +152,7 @@ class _TakeawayViewState extends State<TakeawayView> {
                               child: OutlinedButton(
                                 onPressed: () {},
                                 style: OutlinedButton.styleFrom(
-                                  side: BorderSide(color: AppColors.gold),
+                                  side: const BorderSide(color: AppColors.gold),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
