@@ -20,9 +20,8 @@ class MainApp extends StatelessWidget {
         brightness: Brightness.dark,
         scaffoldBackgroundColor: AppColors.background,
         primaryColor: AppColors.gold,
-        colorScheme: ColorScheme.dark(
+        colorScheme: const ColorScheme.dark(
           primary: AppColors.gold,
-          background: AppColors.background,
           surface: AppColors.panel,
         ),
       ),

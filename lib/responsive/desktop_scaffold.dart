@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:responsive_app/view/landing_page.dart'; // Ensure this matches the file path
+import 'package:responsive_app/page/landing_page.dart'; // Ensure this matches the file path
 
 class DesktopScaffold extends StatelessWidget {
   const DesktopScaffold({super.key});

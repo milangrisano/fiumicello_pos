@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_app/shared/custom_drawer_header.dart';
 import 'package:responsive_app/shared/drawer_list_tile.dart';
-import 'package:responsive_app/view/landing_page.dart';
+import 'package:responsive_app/page/landing_page.dart';
 
 class MobileScaffold extends StatelessWidget {
   const MobileScaffold({super.key});

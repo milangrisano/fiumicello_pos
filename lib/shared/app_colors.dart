@@ -6,6 +6,6 @@ class AppColors {
   static const Color gold = Color(0xFFD4AF37);
   
   // Secondary / Variations
-  static Color goldLight = gold.withOpacity(0.5);
-  static Color goldHighlight = gold.withOpacity(0.15);
+  static Color goldLight = gold.withValues(alpha: 0.5);
+  static Color goldHighlight = gold.withValues(alpha: 0.15);
 }

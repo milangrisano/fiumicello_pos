@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_app/view/landing_page.dart';
+import 'package:responsive_app/page/landing_page.dart';
 
 class TabletScaffold extends StatelessWidget {
   const TabletScaffold({super.key});
