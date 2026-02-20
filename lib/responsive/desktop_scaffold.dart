@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:responsive_app/shared/extend_appbar_button.dart';
 import 'package:responsive_app/view/landing_page.dart'; // Ensure this matches the file path
 
 class DesktopScaffold extends StatelessWidget {
