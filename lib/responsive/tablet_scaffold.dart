@@ -7,7 +7,7 @@ class TabletScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      backgroundColor: Color(0xFF1E1E1E),
+      backgroundColor: Color(0xFFF5F0E8),
       body: LandingPage(),
     );
   }
