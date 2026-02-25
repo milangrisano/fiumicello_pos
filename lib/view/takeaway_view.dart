@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:responsive_app/shared/active_order.dart';
 import 'package:responsive_app/shared/app_colors.dart';
 import 'package:responsive_app/shared/app_text_styles.dart';
+import 'package:responsive_app/widgets/add_product_modal.dart';
 import '../content/content_takeaway.dart';
 import '../content/content_order_item.dart';
 
@@ -61,15 +62,11 @@ class _TakeawayViewState extends State<TakeawayView> {
                         children: [
                           Text(
                             'Order Details',
-                            style: AppTextStyles.w500(fontSize: 18).copyWith(
-                              color: Colors.white,
-                            ),
+                            style: AppTextStyles.w500(fontSize: 18),
                           ),
                           Text(
                             '7:31 PM',
-                            style: AppTextStyles.w500(fontSize: 18).copyWith(
-                              color: AppColors.gold,
-                            ),
+                            style: AppTextStyles.w500(fontSize: 18, color: AppColors.gold),
                           ),
                         ],
                       ),
@@ -83,16 +80,12 @@ class _TakeawayViewState extends State<TakeawayView> {
                         children: [
                           Text(
                             'Customer Name: ',
-                            style: AppTextStyles.text().copyWith(
-                              color: Colors.white54,
-                            ),
+                            style: AppTextStyles.text(color: Colors.white54),
                           ),
                           const Spacer(),
                           Text(
                             'Juan Pérez',
-                            style: AppTextStyles.bold(fontSize: 18).copyWith(
-                              color: AppColors.gold,
-                            ),
+                            style: AppTextStyles.bold(fontSize: 18, color: AppColors.gold),
                           ),
                         ],
                       ),
@@ -125,17 +118,13 @@ class _TakeawayViewState extends State<TakeawayView> {
                             children: [
                               Text(
                                 'Total:',
-                                style: AppTextStyles.pageTitle(fontSize: 18).copyWith(
-                                  color: Colors.white70,
-                                ),
+                                style: AppTextStyles.pageTitle(fontSize: 18, color: Colors.white70),
                               ),
                               Text(
                                 '\$65.88',
-                                style: AppTextStyles.bold(fontSize: 24).copyWith(
-                                  color: AppColors.gold,
-                                ),
+                                style: AppTextStyles.bold(fontSize: 24, color: AppColors.gold),
                               ),
-                            ],
+                            ],  
                           ),
                         ],
                       ),
@@ -150,7 +139,21 @@ class _TakeawayViewState extends State<TakeawayView> {
                             child: SizedBox(
                               height: 56,
                               child: OutlinedButton(
-                                onPressed: () {},
+                                onPressed: () => showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.transparent,
+                                  builder: (_) => const Align(
+                                    alignment: Alignment.center,
+                                    child: FractionallySizedBox(
+                                      widthFactor: 1.75,
+                                      child: AddProductModal(
+                                        customerName: 'Juan Pérez',
+                                        orderId: '710092021',
+                                      ),
+                                    ),
+                                  ),
+                                ),
                                 style: OutlinedButton.styleFrom(
                                   side: const BorderSide(color: AppColors.gold),
                                   shape: RoundedRectangleBorder(
@@ -160,10 +163,7 @@ class _TakeawayViewState extends State<TakeawayView> {
                                 child: Text(
                                   'AGREGAR\nPRODUCTO',
                                   textAlign: TextAlign.center,
-                                  style: AppTextStyles.bold(fontSize: 14).copyWith(
-                                    color: AppColors.gold,
-                                    height: 1.2,
-                                  ),
+                                  style: AppTextStyles.bold(fontSize: 14, color: AppColors.gold, height: 1.2),
                                 ),
                               ),
                             ),
@@ -182,9 +182,7 @@ class _TakeawayViewState extends State<TakeawayView> {
                                 ),
                                 child: Text(
                                   'PAGAR',
-                                  style: AppTextStyles.bold(fontSize: 18).copyWith(
-                                    color: Colors.black87,
-                                  ),
+                                  style: AppTextStyles.bold(fontSize: 18, color: Colors.black87),
                                 ),
                               ),
                             ),
@@ -228,16 +226,12 @@ class _TakeawayViewState extends State<TakeawayView> {
           Expanded(
             child: Text(
               name,
-              style: AppTextStyles.text(fontSize: 16).copyWith(
-                color: Colors.white,
-              ),
+              style: AppTextStyles.text(fontSize: 16),
             ),
           ),
           Text(
             price,
-            style: AppTextStyles.text(fontSize: 16).copyWith(
-              color: Colors.white,
-            ),
+            style: AppTextStyles.text(fontSize: 16),
           ),
         ],
       ),
@@ -251,14 +245,12 @@ class _TakeawayViewState extends State<TakeawayView> {
         Text(
           label,
           style: isMuted 
-              ? AppTextStyles.text(fontSize: 16).copyWith(color: Colors.white38) 
-              : AppTextStyles.text(fontSize: 16).copyWith(color: Colors.white54),
+              ? AppTextStyles.text(fontSize: 16, color: Colors.white38) 
+              : AppTextStyles.text(fontSize: 16, color: Colors.white54),
         ),
         Text(
           value,
-          style: AppTextStyles.w500(fontSize: 16).copyWith(
-            color: Colors.white70,
-          ),
+          style: AppTextStyles.w500(fontSize: 16, color: Colors.white70),
         ),
       ],
     );
