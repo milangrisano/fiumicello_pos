@@ -1,11 +1,32 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const Color background = Color(0xFF1E1E1E);
-  static const Color panel = Color(0xFF2C2C2C);
-  static const Color gold = Color(0xFFD4AF37);
+  //DarkColors
+  // Backgrounds
+  static const Color backgroundDark = Color(0xFF1E1E1E);
+  static const Color surfaceDark = Color(0xFF2C2C2C);
+  
+  // Accents & borders
+  static const Color goldDark = Color(0xFFD4AF37);
   
   // Secondary / Variations
-  static Color goldLight = gold.withValues(alpha: 0.5);
-  static Color goldHighlight = gold.withValues(alpha: 0.15);
+  static Color goldLightDark = goldDark.withValues(alpha: 0.5);
+  static Color goldHighlightDark = goldDark.withValues(alpha: 0.15);
+    
+
+
+  //LightColors
+  // Backgrounds
+  static const Color backgroundLight = Color(0xFFF5F0E8);
+  static const Color surfaceLight = Color(0xFFF8F5EC);
+  
+  // Texts
+  static const Color primaryTextLight = Color(0xFF1A1A1A);
+  static const Color secondaryTextLight = Color(0xFF888888);
+  static const Color mutedTextLight = Color(0xFF666666);
+  static const Color hintLight = Color(0xFFAAAAAA);
+  
+  // Accents & borders
+  static const Color buttonGreenLight = Color(0xFF2D5A27);
+  static const Color borderLight = Color(0xFFD4C5A3);
 }

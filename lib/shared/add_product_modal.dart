@@ -44,7 +44,7 @@ class _AddProductModalState extends State<AddProductModal> {
     return Container(
       height: MediaQuery.of(context).size.height * 0.75,
       decoration: const BoxDecoration(
-        color: AppColors.panel,
+        color: AppColors.surfaceDark,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -117,7 +117,7 @@ class _AddProductModalState extends State<AddProductModal> {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.edit, color: AppColors.gold, size: 16),
+                        icon: const Icon(Icons.edit, color: AppColors.goldDark, size: 16),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                         tooltip: 'Editar cliente',
@@ -189,11 +189,11 @@ class _AddProductModalState extends State<AddProductModal> {
                           padding: const EdgeInsets.symmetric(
                               vertical: 10, horizontal: 8),
                           decoration: BoxDecoration(
-                            color: isSelected ? AppColors.gold.withValues(alpha: 0.15) : Colors.transparent,
+                            color: isSelected ? AppColors.goldDark.withValues(alpha: 0.15) : Colors.transparent,
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
                               color:
-                                  isSelected ? AppColors.gold : Colors.transparent,
+                                  isSelected ? AppColors.goldDark : Colors.transparent,
                               width: 1,
                             ),
                           ),
@@ -202,7 +202,7 @@ class _AddProductModalState extends State<AddProductModal> {
                               Icon(
                                 cat.icon,
                                 color: isSelected
-                                    ? AppColors.gold
+                                    ? AppColors.goldDark
                                     : Colors.white38,
                                 size: 22,
                               ),
@@ -213,7 +213,7 @@ class _AddProductModalState extends State<AddProductModal> {
                                 style: AppTextStyles.text(
                                   fontSize: 11,
                                   color: isSelected
-                                      ? AppColors.gold
+                                      ? AppColors.goldDark
                                       : Colors.white54,
                                 ),
                               ),
@@ -287,11 +287,11 @@ class _ProductCard extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                color: AppColors.gold.withValues(alpha: 0.12),
+                color: AppColors.goldDark.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(product.icon,
-                    color: AppColors.gold, size: 26),
+                    color: AppColors.goldDark, size: 26),
               ),
               const SizedBox(height: 8),
               Text(
@@ -305,7 +305,7 @@ class _ProductCard extends StatelessWidget {
               Text(
                 product.price,
                 style: AppTextStyles.w500(
-                    fontSize: 13, color: AppColors.gold),
+                    fontSize: 13, color: AppColors.goldDark),
               ),
             ],
           ),

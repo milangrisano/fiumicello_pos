@@ -7,56 +7,8 @@ import 'package:responsive_app/shared/app_text_styles.dart';
 // ─────────────────────────────────────────
 // Mock data
 // ─────────────────────────────────────────
-class _MenuCategory {
-  final String name;
-  const _MenuCategory(this.name);
-}
+import 'package:responsive_app/content/content_landing.dart';
 
-class _MenuItem {
-  final String name;
-  final String description;
-  final String price;
-  final String category;
-  final Color plateColor;
-
-  const _MenuItem({
-    required this.name,
-    required this.description,
-    required this.price,
-    required this.category,
-    required this.plateColor,
-  });
-}
-
-const _categories = [
-  _MenuCategory('Antipasti'),
-  _MenuCategory('Primi'),
-  _MenuCategory('Secondi'),
-  _MenuCategory('Contorni'),
-  _MenuCategory('Dolci'),
-];
-
-const _menuItems = [
-  // Primi
-  _MenuItem(name: 'Tagliatelle al Tartufo Nero', description: 'Creamy tagliatelle with Parmesan and Parmesan', price: '\$28.00', category: 'Primi', plateColor: Color(0xFFF5DEB3)),
-  _MenuItem(name: 'Carbonara Autentica', description: 'Rigatoni coated with a silky egg and pecorino sauce with guanciale', price: '\$24.00', category: 'Primi', plateColor: Color(0xFFFFD700)),
-  _MenuItem(name: 'Orecchiette con Cime di Rapa', description: 'Ear-shaped pasta with broccoli rabe, garlic, and chili', price: '\$22.00', category: 'Primi', plateColor: Color(0xFF90EE90)),
-  _MenuItem(name: 'Gnocchi alla Sorrentina', description: 'Fluffy potato gnocchi in a vibrant tomato and basil sauce with melting mozzarella', price: '\$26.00', category: 'Primi', plateColor: Color(0xFFFF6347)),
-  // Secondi
-  _MenuItem(name: 'Osso Buco alla Milanese', description: 'Braised veal shank with gremolata over saffron risotto', price: '\$42.00', category: 'Secondi', plateColor: Color(0xFFFFD700)),
-  _MenuItem(name: 'Filetto di Manzo al Barolo', description: 'Tender beef fillet with a red wine reduction and roasted vegetables', price: '\$48.00', category: 'Secondi', plateColor: Color(0xFF8B4513)),
-  _MenuItem(name: 'Branzino al Forno', description: 'Whole roasted sea bass with lemon, herbs and cherry tomatoes', price: '\$38.00', category: 'Secondi', plateColor: Color(0xFFE0E0E0)),
-  _MenuItem(name: 'Cotoletta alla Bolognese', description: 'Breaded veal cutlet topped with prosciutto and Parmesan crostini', price: '\$36.00', category: 'Secondi', plateColor: Color(0xFFF5DEB3)),
-  // Antipasti
-  _MenuItem(name: 'Bruschetta al Pomodoro', description: 'Toasted bread with fresh tomatoes, basil and extra-virgin olive oil', price: '\$12.00', category: 'Antipasti', plateColor: Color(0xFFFF6347)),
-  _MenuItem(name: 'Carpaccio di Manzo', description: 'Paper-thin beef slices with arugula, capers and Parmesan shavings', price: '\$18.00', category: 'Antipasti', plateColor: Color(0xFFFFB6C1)),
-  // Contorni
-  _MenuItem(name: 'Patate al Forno', description: 'Oven-roasted potatoes with rosemary and garlic', price: '\$9.00', category: 'Contorni', plateColor: Color(0xFFFFD700)),
-  _MenuItem(name: 'Verdure Grigliate', description: 'Grilled seasonal vegetables with extra-virgin olive oil', price: '\$11.00', category: 'Contorni', plateColor: Color(0xFF90EE90)),
-  // Dolci
-  _MenuItem(name: 'Tiramisù Classico', description: 'Classic espresso-soaked ladyfingers with mascarpone cream', price: '\$10.00', category: 'Dolci', plateColor: Color(0xFF8B4513)),
-  _MenuItem(name: 'Panna Cotta al Frutti di Bosco', description: 'Silky vanilla panna cotta with mixed berry coulis', price: '\$9.00', category: 'Dolci', plateColor: Color(0xFFFF69B4)),
-];
 
 // ─────────────────────────────────────────
 // Landing Page
@@ -71,11 +23,11 @@ class LandingPage extends StatefulWidget {
 class _LandingPageState extends State<LandingPage> {
   String _selectedCategory = 'Primi';
 
-  List<_MenuItem> get _filtered =>
-      _menuItems.where((m) => m.category == _selectedCategory).toList();
+  List<LandingMenuItem> get _filtered =>
+      landingMenuItems.where((m) => m.category == _selectedCategory).toList();
 
   List<String> get _displayCategories =>
-      _categories.map((c) => c.name).toList();
+      landingCategories.map((c) => c.name).toList();
 
   void _openLoginModal() {
     showDialog(
@@ -99,9 +51,9 @@ class _LandingPageState extends State<LandingPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F0E8),
-      body: Column(
+    return Container(
+      color: const Color(0xFFF5F0E8),
+      child: Column(
         children: [
           _Header(onAvatarTap: _openLoginModal),
           _CategoryPills(
@@ -241,7 +193,7 @@ class _CategoryPills extends StatelessWidget {
 // ─────────────────────────────────────────
 class _ProductGrid extends StatelessWidget {
   final String category;
-  final List<_MenuItem> items;
+  final List<LandingMenuItem> items;
   const _ProductGrid({required this.category, required this.items});
 
   @override
@@ -281,7 +233,7 @@ class _ProductGrid extends StatelessWidget {
 // Product Card
 // ─────────────────────────────────────────
 class _ProductCard extends StatelessWidget {
-  final _MenuItem item;
+  final LandingMenuItem item;
   const _ProductCard({required this.item});
 
   @override
@@ -542,9 +494,9 @@ class _LoginModalState extends State<_LoginModal> {
                     'Create an Account',
                     style: GoogleFonts.outfit(
                       fontSize: 13,
-                      color: AppColors.goldLight,
+                      color: AppColors.goldLightDark,
                       decoration: TextDecoration.underline,
-                      decorationColor: AppColors.goldLight,
+                      decorationColor: AppColors.goldLightDark,
                     ),
                   ),
                 ),
@@ -564,11 +516,11 @@ class _LoginModalState extends State<_LoginModal> {
     contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
-      borderSide: BorderSide(color: AppColors.goldLight, width: 2), // Gold, doubled width
+      borderSide: BorderSide(color: AppColors.goldLightDark, width: 2), // Gold, doubled width
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
-      borderSide: BorderSide(color: AppColors.goldLight, width: 3), // Gold, doubled width
+      borderSide: BorderSide(color: AppColors.goldLightDark, width: 3), // Gold, doubled width
     ),
     errorBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),

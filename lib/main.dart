@@ -18,11 +18,11 @@ class MainApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: AppColors.background,
-        primaryColor: AppColors.gold,
+        scaffoldBackgroundColor: AppColors.backgroundDark,
+        primaryColor: AppColors.goldDark,
         colorScheme: const ColorScheme.dark(
-          primary: AppColors.gold,
-          surface: AppColors.panel,
+          primary: AppColors.goldDark,
+          surface: AppColors.surfaceDark,
         ),
       ),
       home: const ResponsiveLayout(

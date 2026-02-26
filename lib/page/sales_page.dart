@@ -16,14 +16,14 @@ class SalesPage extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            color: AppColors.background,
+            color: AppColors.backgroundDark,
             child: Material(
-              color: AppColors.background,
+              color: AppColors.backgroundDark,
               elevation: 2,
               child: TabBar(
                 indicator: BoxDecoration(
                   borderRadius: BorderRadius.circular(50),
-                  color: AppColors.gold,
+                  color: AppColors.goldDark,
                 ),
                 indicatorSize: TabBarIndicatorSize.tab,
                 dividerColor: Colors.transparent,
