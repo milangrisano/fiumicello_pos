@@ -80,7 +80,7 @@ class _TakeawayViewState extends State<TakeawayView> {
                         children: [
                           Text(
                             'Customer Name: ',
-                            style: AppTextStyles.text(color: Colors.white54),
+                            style: AppTextStyles.pageTitle(color: Colors.white54),
                           ),
                           const Spacer(),
                           Text(
@@ -226,12 +226,12 @@ class _TakeawayViewState extends State<TakeawayView> {
           Expanded(
             child: Text(
               name,
-              style: AppTextStyles.text(fontSize: 16),
+              style: AppTextStyles.pageTitle(fontSize: 16),
             ),
           ),
           Text(
             price,
-            style: AppTextStyles.text(fontSize: 16),
+            style: AppTextStyles.w500(fontSize: 16),
           ),
         ],
       ),
@@ -245,8 +245,8 @@ class _TakeawayViewState extends State<TakeawayView> {
         Text(
           label,
           style: isMuted 
-              ? AppTextStyles.text(fontSize: 16, color: Colors.white38) 
-              : AppTextStyles.text(fontSize: 16, color: Colors.white54),
+              ? AppTextStyles.pageTitle(fontSize: 16, color: Colors.white38) 
+              : AppTextStyles.pageTitle(fontSize: 16, color: Colors.white54),
         ),
         Text(
           value,

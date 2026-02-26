@@ -81,7 +81,7 @@ class ActiveOrders extends StatelessWidget {
                                 const SizedBox(width: 8),
                                 Text(
                                   order.time,
-                                  style: AppTextStyles.text().copyWith(
+                                  style: AppTextStyles.w500().copyWith(
                                     color: Colors.white38,
                                   ),
                                 ),

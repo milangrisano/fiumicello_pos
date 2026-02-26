@@ -3,7 +3,24 @@ import 'package:google_fonts/google_fonts.dart';
 
 
 class AppTextStyles {
-  // Headings
+  static TextStyle text({
+    double fontSize = 14,
+    Color color = Colors.white,
+    FontWeight weight = FontWeight.w400,
+    double? height,
+    TextDecoration? decoration,
+    Color? decorationColor,
+  }) {
+    return GoogleFonts.outfit(
+      fontSize: fontSize,
+      color: color,
+      fontWeight: weight,
+      height: height,
+      decoration: decoration,
+      decorationColor: decorationColor,
+    );
+  }
+
   static TextStyle w500({
     double fontSize = 14, 
     Color color = Colors.white,
@@ -22,17 +39,6 @@ class AppTextStyles {
     }) => GoogleFonts.outfit(
     fontSize: fontSize,
     fontWeight: FontWeight.w300,
-    color: color,
-    height: height,
-  ); 
-
-  static TextStyle text({
-    double fontSize = 14,
-    Color color = Colors.white,
-    double? height,
-    }) => GoogleFonts.outfit(
-    fontSize: fontSize,
-    fontWeight: FontWeight.normal,
     color: color,
     height: height,
   );

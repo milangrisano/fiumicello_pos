@@ -30,7 +30,7 @@ class SalesPage extends StatelessWidget {
                 labelColor: Colors.black87,
                 unselectedLabelColor: Colors.white,
                 labelStyle: AppTextStyles.bold(fontSize: 18),
-                unselectedLabelStyle: AppTextStyles.text(fontSize: 18),
+                unselectedLabelStyle: AppTextStyles.w500(fontSize: 18),
                 labelPadding: const EdgeInsets.symmetric(horizontal: 4),
                 tabs: const [
                   Tab(text: 'Para Llevar'),

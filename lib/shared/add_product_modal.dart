@@ -97,7 +97,7 @@ class _AddProductModalState extends State<AddProductModal> {
                       const SizedBox(width: 5),
                       Text(
                         '#${widget.orderId}',
-                        style: AppTextStyles.text(fontSize: 12, color: Colors.white54),
+                        style: AppTextStyles.pageTitle(fontSize: 12, color: Colors.white54),
                       ),
                     ],
                   ),
@@ -141,10 +141,10 @@ class _AddProductModalState extends State<AddProductModal> {
             child: TextField(
               controller: _searchController,
               onChanged: (val) => setState(() => _searchQuery = val),
-              style: AppTextStyles.text(fontSize: 14),
+              style: AppTextStyles.pageTitle(fontSize: 14),
               decoration: InputDecoration(
                 hintText: 'Buscar producto…',
-                hintStyle: AppTextStyles.text(fontSize: 14, color: Colors.white38),
+                hintStyle: AppTextStyles.pageTitle(fontSize: 14, color: Colors.white38),
                 prefixIcon: const Icon(Icons.search, color: Colors.white38, size: 20),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
@@ -210,7 +210,7 @@ class _AddProductModalState extends State<AddProductModal> {
                               Text(
                                 cat.name,
                                 textAlign: TextAlign.center,
-                                style: AppTextStyles.text(
+                                style: AppTextStyles.pageTitle(
                                   fontSize: 11,
                                   color: isSelected
                                       ? AppColors.goldDark
@@ -234,7 +234,7 @@ class _AddProductModalState extends State<AddProductModal> {
                       ? Center(
                           child: Text(
                             'Sin resultados',
-                            style: AppTextStyles.text(
+                            style: AppTextStyles.w500(
                                 fontSize: 14, color: Colors.white38),
                           ),
                         )
@@ -299,7 +299,7 @@ class _ProductCard extends StatelessWidget {
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: AppTextStyles.text(fontSize: 11),
+                style: AppTextStyles.pageTitle(fontSize: 11),
               ),
               const SizedBox(height: 4),
               Text(

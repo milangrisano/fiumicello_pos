@@ -10,8 +10,8 @@ class AppColors {
   static const Color goldDark = Color(0xFFD4AF37);
   
   // Secondary / Variations
-  static Color goldLightDark = goldDark.withValues(alpha: 0.5);
-  static Color goldHighlightDark = goldDark.withValues(alpha: 0.15);
+  static const Color goldLightDark = Color.fromARGB(255, 179, 142, 21);
+  static const Color goldHighlightDark = Color.fromARGB(255, 212, 175, 55);
     
 
 
