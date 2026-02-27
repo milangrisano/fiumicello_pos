@@ -22,16 +22,20 @@ class LandingPage extends StatefulWidget {
 }
 
 class _LandingPageState extends State<LandingPage> {
-  String _selectedCategory = 'Todos'; // Opción todos por defecto
+  // Option 'Todos' removed, defaulting to the first category
+  String _selectedCategory = landingCategories.isNotEmpty ? landingCategories.first.name : ''; 
   bool _showGrid = true; // Controla que vista se muestra
 
-  List<LandingMenuItem> get _filtered =>
-      _selectedCategory == 'Todos' 
-          ? landingMenuItems 
-          : landingMenuItems.where((m) => m.category == _selectedCategory).toList();
-
   List<String> get _displayCategories =>
-      ['Todos', ...landingCategories.map((c) => c.name)];
+      landingCategories.map((c) => c.name).toList();
+
+  List<LandingMenuItem> get _orderedItems {
+    final List<LandingMenuItem> ordered = [];
+    for (final cat in landingCategories) {
+      ordered.addAll(landingMenuItems.where((m) => m.category == cat.name));
+    }
+    return ordered;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,10 +54,21 @@ class _LandingPageState extends State<LandingPage> {
                 child: _showGrid 
                   ? ProductGrid(
                       category: _selectedCategory,
-                      items: _filtered,
+                      items: _orderedItems, // Update to use ordered items
+                      onCategoryChange: (newCategory) {
+                        if (_selectedCategory != newCategory) {
+                          setState(() => _selectedCategory = newCategory);
+                        }
+                      },
                     )
                   : ProductSwiper(
-                      items: _filtered,
+                      category: _selectedCategory,
+                      items: _orderedItems, // Update to use ordered items
+                      onCategoryChange: (newCategory) {
+                        if (_selectedCategory != newCategory) {
+                          setState(() => _selectedCategory = newCategory);
+                        }
+                      },
                     ),
               ),
             ],
