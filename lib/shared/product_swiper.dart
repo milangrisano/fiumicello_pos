@@ -16,10 +16,6 @@ class ProductSwiper extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Determinamos un ancho máximo para mantener las proporciones 
-        // de la carta parecidas al grid y que no se estire demasiado a lo ancho
-        final cardWidth = constraints.maxWidth * 0.72;
-
         return Column(
           children: [
             Expanded(
@@ -27,32 +23,56 @@ class ProductSwiper extends StatelessWidget {
                 itemBuilder: (BuildContext context, int index) {
                   // Instanciamos el ProductCard con proporciones personalizadas:
                   // 3/4 (flex = 3) para la imagen, 1/4 (flex = 1) para text
-                  return ProductCard(
-                    item: items[index],
-                    imageFlex: 3,
-                    textFlex: 1,
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 60.0, top: 10.0),
+                    child: ProductCard(
+                      item: items[index],
+                      imageFlex: 3,
+                      textFlex: 1,
+                    ),
                   );
                 },
                 itemCount: items.length,
-                itemWidth: cardWidth,
-                itemHeight: cardWidth * 0.8,
-                layout: SwiperLayout.STACK,
+                viewportFraction: 0.5,
+                scale: 0.8,
                 loop: true,
-                pagination: const SwiperPagination(
-                  margin: EdgeInsets.only(top: 20), // Margen para sacarlos de la caja de la carta
-                  builder: DotSwiperPaginationBuilder(
-                    activeColor: AppColors.goldLightDark,
-                    color: AppColors.mutedTextLight,
-                  ),
-                ),
-                control: const SwiperControl(
-                  color: AppColors.goldLightDark,
-                  size: 30,
-                  padding: EdgeInsets.symmetric(horizontal: 10),
+                pagination: SwiperCustomPagination(
+                  builder: (BuildContext context, SwiperPluginConfig config) {
+                    final colorScheme = Theme.of(context).colorScheme;
+                    return Container(
+                      alignment: Alignment.bottomCenter,
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+                            color: AppColors.goldLightDark,
+                            onPressed: () {
+                              config.controller.previous();
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                          // Puntos de paginación estándar integrados
+                          DotSwiperPaginationBuilder(
+                            activeColor: AppColors.goldLightDark,
+                            color: colorScheme.onSurface.withValues(alpha: 0.3),
+                          ).build(context, config),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            icon: const Icon(Icons.arrow_forward_ios, size: 20),
+                            color: AppColors.goldLightDark,
+                            onPressed: () {
+                              config.controller.next();
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
-            const SizedBox(height: 20),
           ],
         );
       }

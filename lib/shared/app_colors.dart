@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AppColors {
   //DarkColors
   // Backgrounds
-  static const Color backgroundDark = Color(0xFF1E1E1E);
+  static const Color backgroundDark = Color.fromARGB(255, 68, 64, 64);
   static const Color surfaceDark = Color(0xFF2C2C2C);
   
   // Accents & borders

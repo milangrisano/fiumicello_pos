@@ -53,13 +53,17 @@ class ProductGrid extends StatelessWidget {
     return [
       Padding(
         padding: const EdgeInsets.only(bottom: 16),
-        child: Text(
-          title,
-          style: AppTextStyles.text(
-            fontSize: 24,
-            weight: FontWeight.w600,
-            color: AppColors.primaryTextLight,
-          ),
+        child: Builder(
+          builder: (context) {
+            return Text(
+              title,
+              style: AppTextStyles.text(
+                fontSize: 24,
+                weight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            );
+          }
         ),
       ),
       GridView.builder(
@@ -112,7 +116,7 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.backgroundLight,
+        color: AppColors.surfaceDark,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: AppColors.goldLightDark,
@@ -168,7 +172,7 @@ class ProductCard extends StatelessWidget {
                     style: AppTextStyles.text(
                       fontSize: 13,
                       weight: FontWeight.w600,
-                      color: AppColors.primaryTextLight,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -179,7 +183,7 @@ class ProductCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: AppTextStyles.text(
                         fontSize: 10,
-                        color: AppColors.mutedTextLight,
+                        color: Colors.white.withValues(alpha: 0.6),
                       ),
                     ),
                   ),
@@ -189,7 +193,7 @@ class ProductCard extends StatelessWidget {
                     style: AppTextStyles.text(
                       fontSize: 14,
                       weight: FontWeight.w700,
-                      color: AppColors.primaryTextLight,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 6),

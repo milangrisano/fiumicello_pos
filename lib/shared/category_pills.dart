@@ -19,13 +19,26 @@ class CategoryPills extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
-      color: AppColors.backgroundLight,
+      color: Theme.of(context).scaffoldBackgroundColor,
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: categories.map((cat) {
           final isSelected = cat == selected;
+
+          Color bgColor = Colors.transparent;
+          Color borderColor = colorScheme.onSurface;
+          Color textColor = colorScheme.onSurface;
+
+          if (isSelected) {
+            bgColor = AppColors.surfaceDark;
+            borderColor = AppColors.goldDark;
+            textColor = AppColors.goldDark;
+          }
+
           return GestureDetector(
             onTap: () => onSelect(cat),
             child: AnimatedContainer(
@@ -33,14 +46,14 @@ class CategoryPills extends StatelessWidget {
               margin: const EdgeInsets.symmetric(horizontal: 5),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primaryTextLight : Colors.transparent,
+                color: bgColor,
                 borderRadius: BorderRadius.circular(50),
-                border: Border.all(color: AppColors.primaryTextLight, width: 1),
+                border: Border.all(color: borderColor, width: 1),
               ),
               child: Text(
                 cat,
                 style: AppTextStyles.text(
-                  color: isSelected ? Colors.white : AppColors.primaryTextLight,
+                  color: textColor,
                   fontSize: 14,
                   weight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 ),

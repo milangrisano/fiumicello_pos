@@ -4,6 +4,8 @@ import 'package:responsive_app/page/sales_page.dart';
 import 'package:responsive_app/shared/app_colors.dart';
 import 'package:responsive_app/shared/app_text_styles.dart';
 import 'package:responsive_app/shared/login_modal.dart';
+import 'package:provider/provider.dart';
+import 'package:responsive_app/shared/theme_provider.dart';
 import 'package:responsive_app/content/content_landing.dart';
 
 class DesktopScaffold extends StatelessWidget {
@@ -11,8 +13,8 @@ class DesktopScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: _DesktopAppBar(),
       body: LandingPage(),
     );
@@ -48,7 +50,7 @@ class _DesktopAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       elevation: 0,
       toolbarHeight: 80,
       titleSpacing: 24,
@@ -57,30 +59,38 @@ class _DesktopAppBar extends StatelessWidget implements PreferredSizeWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           GestureDetector(
-            onTap: () => _openLoginModal(context),
+            onTap: () {
+              context.read<ThemeProvider>().toggleTheme();
+            },
             child: Container(
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: AppColors.surfaceDark,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Icon(Icons.person, color: AppColors.goldDark, size: 22),
+              child: Icon(
+                context.watch<ThemeProvider>().isDarkMode 
+                  ? Icons.light_mode_outlined 
+                  : Icons.dark_mode_outlined,
+                color: Theme.of(context).colorScheme.primary, 
+                size: 22
+              ),
             ),
           ),
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  LandingStrings.fiumicelloLogo,
-                  style: AppTextStyles.text(
-                    fontSize: 38,
-                    color: AppColors.primaryTextLight,
-                    weight: FontWeight.w400,
-                    height: 1.0,
+                  Text(
+                    LandingStrings.fiumicelloLogo,
+                    style: AppTextStyles.text(
+                      fontSize: 38,
+                      color: Theme.of(context).colorScheme.onSurface,
+                      weight: FontWeight.w400,
+                      height: 1.0,
+                    ),
                   ),
-                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -100,14 +110,22 @@ class _DesktopAppBar extends StatelessWidget implements PreferredSizeWidget {
               ],
             ),
           ),
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: AppColors.surfaceDark,
-              borderRadius: BorderRadius.circular(20),
+          TextButton(
+            onPressed: () => _openLoginModal(context),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              backgroundColor: AppColors.surfaceDark,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: const BorderSide(color: AppColors.goldDark),
+              ),
             ),
-            child: const Icon(Icons.shopping_cart_outlined, color: AppColors.goldDark, size: 22),
+            child: Text(
+              'Iniciar sesión',
+              style: AppTextStyles.w500(
+                color: AppColors.goldDark,
+              ),
+            ),
           ),
         ],
       ),

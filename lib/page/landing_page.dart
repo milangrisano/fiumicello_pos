@@ -36,7 +36,7 @@ class _LandingPageState extends State<LandingPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.backgroundLight,
+      color: Theme.of(context).scaffoldBackgroundColor,
       child: Stack(
         children: [
           Column(
@@ -60,8 +60,9 @@ class _LandingPageState extends State<LandingPage> {
           ),
           Positioned(
             bottom: 24,
-            right: 24,
+            left: 24,
             child: FloatingActionButton(
+              heroTag: 'view_toggle_fab',
               backgroundColor: AppColors.primaryTextLight,
               foregroundColor: AppColors.goldDark,
               onPressed: () {
@@ -70,6 +71,19 @@ class _LandingPageState extends State<LandingPage> {
                 });
               },
               child: Icon(_showGrid ? Icons.layers : Icons.grid_view), 
+            ),
+          ),
+          Positioned(
+            bottom: 24,
+            right: 24,
+            child: FloatingActionButton(
+              heroTag: 'cart_fab',
+              backgroundColor: AppColors.primaryTextLight,
+              foregroundColor: AppColors.goldDark,
+              onPressed: () {
+                // TODO: Acción del carrito
+              },
+              child: const Icon(Icons.shopping_cart_outlined), 
             ),
           ),
         ],
