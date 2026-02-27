@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_app/responsive/desktop_scaffold.dart';
-import 'package:responsive_app/responsive/mobile_scaffold.dart';
-import 'package:responsive_app/responsive/reponsive_layout.dart';
-import 'package:responsive_app/responsive/tablet_scaffold.dart';
 import 'package:responsive_app/shared/app_colors.dart';
+import 'package:responsive_app/router/app_router.dart';
 
 import 'package:provider/provider.dart';
 import 'package:responsive_app/shared/theme_provider.dart';
@@ -24,8 +21,9 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDarkMode = context.watch<ThemeProvider>().isDarkMode;
 
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
+      routerConfig: appRouter,
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       theme: ThemeData(
         brightness: Brightness.light,
@@ -46,11 +44,6 @@ class MainApp extends StatelessWidget {
           surface: AppColors.surfaceDark,
           onSurface: Colors.white,
         ),
-      ),
-      home: const ResponsiveLayout(
-        mobileScaffold: MobileScaffold(),
-        tabletScaffold: TabletScaffold(),
-        desktopScaffold: DesktopScaffold(),
       ),
     );
   }

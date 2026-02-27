@@ -3,13 +3,15 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:responsive_app/shared/app_colors.dart';
 import 'package:responsive_app/content/content_landing.dart';
 import 'package:responsive_app/shared/app_text_styles.dart';
+import 'package:responsive_app/shared/create_account_modal.dart';
 
 // ─────────────────────────────────────────
 // Login Modal  (diseño del mockup)
 // ─────────────────────────────────────────
 class LoginModal extends StatefulWidget {
   final VoidCallback onSuccess;
-  const LoginModal({super.key, required this.onSuccess});
+  final VoidCallback? onCreateAccountTap;
+  const LoginModal({super.key, required this.onSuccess, this.onCreateAccountTap});
 
   @override
   State<LoginModal> createState() => _LoginModalState();
@@ -23,7 +25,7 @@ class _LoginModalState extends State<LoginModal> {
   bool _loading  = false;
   String? _error;
 
-  static const _validEmail = 'admin';
+  static const _validEmail = 'admin@admin.com';
   static const _validPass  = '1234';
 
   void _submit() async {
@@ -99,8 +101,12 @@ class _LoginModalState extends State<LoginModal> {
                   textInputAction: TextInputAction.next,
                   style: GoogleFonts.outfit(fontSize: 14, color: AppColors.primaryTextLight),
                   decoration: _field(LandingStrings.emailHint),
-                  validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? LandingStrings.emailError : null,
+                  validator: (v) {
+                    if (v == null || v.trim().isEmpty) return LandingStrings.emailError;
+                    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,}$');
+                    if (!emailRegex.hasMatch(v.trim())) return LandingStrings.invalidEmailError;
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 12),
 
@@ -170,15 +176,38 @@ class _LoginModalState extends State<LoginModal> {
                 const SizedBox(height: 16),
 
                 // ── Create an Account ──
-                GestureDetector(
-                  onTap: () { /* TODO: registro */ },
-                  child: Text(
-                    LandingStrings.btnCreateAccount,
-                    style: AppTextStyles.text(
-                      fontSize: 13,
-                      color: AppColors.goldLightDark,
-                      decoration: TextDecoration.underline,
-                      decorationColor: AppColors.goldLightDark,
+                MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: widget.onCreateAccountTap ?? () {
+                      // Usar el contexto de overlay para evitar usar un contexto desmontado tras el pop
+                      final BuildContext rootContext = Navigator.of(context).overlay!.context;
+                      Navigator.of(context).pop();
+                      
+                      showDialog(
+                        context: rootContext,
+                        barrierColor: Colors.black54,
+                        builder: (_) => CreateAccountModal(
+                          onSuccess: widget.onSuccess,
+                          onLoginTap: () {
+                             Navigator.of(rootContext).pop();
+                             showDialog(
+                               context: rootContext,
+                               barrierColor: Colors.black54,
+                               builder: (_) => LoginModal(onSuccess: widget.onSuccess),
+                             );
+                          },
+                        ),
+                      );
+                    },
+                    child: Text(
+                      LandingStrings.btnCreateAccount,
+                      style: AppTextStyles.text(
+                        fontSize: 13,
+                        color: AppColors.goldLightDark,
+                        decoration: TextDecoration.underline,
+                        decorationColor: AppColors.goldLightDark,
+                      ),
                     ),
                   ),
                 ),

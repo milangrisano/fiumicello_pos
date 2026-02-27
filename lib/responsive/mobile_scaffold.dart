@@ -5,18 +5,20 @@ import 'package:responsive_app/shared/theme_provider.dart';
 import 'package:responsive_app/shared/app_colors.dart';
 import 'package:responsive_app/shared/app_text_styles.dart';
 import 'package:responsive_app/content/content_landing.dart';
-import 'package:responsive_app/page/sales_page.dart';
 import 'package:responsive_app/shared/login_modal.dart';
+import 'package:go_router/go_router.dart';
 
 class MobileScaffold extends StatelessWidget {
-  const MobileScaffold({super.key});
+  final String? category;
+  final Widget? body;
+  const MobileScaffold({super.key, this.category, this.body});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: const _MobileAppBar(),
-      body: const LandingPage(),
+      body: body ?? LandingPage(category: category),
     );
   }
 }
@@ -34,14 +36,7 @@ class _MobileAppBar extends StatelessWidget implements PreferredSizeWidget {
       builder: (_) => LoginModal(
         onSuccess: () {
           Navigator.of(context).pop();
-          Navigator.of(context).pushReplacement(
-            PageRouteBuilder(
-              pageBuilder: (_, animation, __) => const SalesPage(),
-              transitionsBuilder: (_, animation, __, child) =>
-                  FadeTransition(opacity: animation, child: child),
-              transitionDuration: const Duration(milliseconds: 400),
-            ),
-          );
+          context.go('/sales');
         },
       ),
     );
@@ -91,9 +86,11 @@ class _MobileAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
             ],
           ),
-          GestureDetector(
-            onTap: () => _openLoginModal(context),
-            child: Container(
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () => _openLoginModal(context),
+                child: Container(
               width: 36,
               height: 36,
               decoration: BoxDecoration(
@@ -103,6 +100,8 @@ class _MobileAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
               child: const Icon(Icons.login, color: AppColors.goldDark, size: 18),
             ),
+          ),
+            ],
           ),
         ],
       ),
