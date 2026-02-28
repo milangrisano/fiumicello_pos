@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_app/content/content_takeaway.dart';
+import 'package:responsive_app/shared/app_colors.dart';
 import 'package:responsive_app/shared/app_text_styles.dart';
 
 class ActiveOrders extends StatelessWidget {
@@ -20,11 +21,12 @@ class ActiveOrders extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
         color: panelColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white10),
+        border: Border.all(color: isDark ? Colors.white10 : AppColors.borderLight),
       ),
       child: Column(
         children: [
@@ -36,7 +38,7 @@ class ActiveOrders extends StatelessWidget {
               child: Text(
                 'Ordenes para llevar',
                 style: AppTextStyles.pageTitle(fontSize: 18).copyWith(
-                  color: Colors.white70,
+                  color: isDark ? Colors.white70 : AppColors.primaryTextLight,
                 ),
               ),
             ),
@@ -75,24 +77,20 @@ class ActiveOrders extends StatelessWidget {
                                 Text(
                                   order.id,
                                   style: AppTextStyles.bold().copyWith(
-                                    color: isSelected ? goldColor : Colors.white54,
+                                    color: isSelected ? goldColor : AppColors.secondaryTextLight,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
                                   order.time,
-                                  style: AppTextStyles.w500().copyWith(
-                                    color: Colors.white38,
-                                  ),
+                                  style: AppTextStyles.pageTitle(color: isSelected ? goldColor : AppColors.secondaryTextLight),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 4),
                             Text(
                               order.name,
-                              style: AppTextStyles.w500(fontSize: 16).copyWith(
-                                color: Colors.white,
-                              ),
+                              style: AppTextStyles.w500(fontSize: 16, color: isSelected ? goldColor : AppColors.secondaryTextLight)
                             ),
                           ],
                         ),
@@ -123,7 +121,7 @@ class ActiveOrders extends StatelessWidget {
                 child: Text(
                   'NUEVA ORDEN',
                   style: AppTextStyles.bold(fontSize: 18).copyWith(
-                    color: Colors.black87,
+                    color: isDark ? Colors.black87 : Colors.white,
                   ),
                 ),
               ),

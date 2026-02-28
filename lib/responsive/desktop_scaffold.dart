@@ -5,7 +5,6 @@ import 'package:responsive_app/shared/app_text_styles.dart';
 import 'package:responsive_app/shared/login_modal.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_app/shared/theme_provider.dart';
-import 'package:responsive_app/content/content_landing.dart';
 import 'package:go_router/go_router.dart';
 
 class DesktopScaffold extends StatelessWidget {
@@ -74,35 +73,9 @@ class _DesktopAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
           Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                  Text(
-                    LandingStrings.fiumicelloLogo,
-                    style: AppTextStyles.text(
-                      fontSize: 38,
-                      color: Theme.of(context).colorScheme.onSurface,
-                      weight: FontWeight.w400,
-                      height: 1.0,
-                    ),
-                  ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(width: 40, height: 1, color: AppColors.secondaryTextLight),
-                    const SizedBox(width: 8),
-                    Text(
-                      LandingStrings.estYear, 
-                      style: AppTextStyles.text(
-                        fontSize: 10, 
-                        color: AppColors.secondaryTextLight
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(width: 40, height: 1, color: AppColors.secondaryTextLight),
-                  ],
-                ),
-              ],
+            child: Image.asset(
+              'assets/images/fiumicello_hat.png',
+              height: 60,
             ),
           ),
           const SizedBox(width: 8),

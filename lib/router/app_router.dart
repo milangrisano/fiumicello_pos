@@ -20,7 +20,11 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/cart',
-      builder: (context, state) => const CartPage(),
+      builder: (context, state) => const ResponsiveLayout(
+        mobileScaffold: MobileScaffold(body: CartPage()),
+        tabletScaffold: TabletScaffold(body: CartPage()),
+        desktopScaffold: DesktopScaffold(body: CartPage()),
+      ),
     ),
     GoRoute(
       path: '/sales',
