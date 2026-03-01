@@ -4,11 +4,15 @@ import 'package:responsive_app/router/app_router.dart';
 
 import 'package:provider/provider.dart';
 import 'package:responsive_app/shared/theme_provider.dart';
+import 'package:responsive_app/shared/auth_provider.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider.value(value: AuthProvider.instance),
+      ],
       child: const MainApp(),
     ),
   );

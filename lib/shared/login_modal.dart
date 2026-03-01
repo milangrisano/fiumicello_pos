@@ -5,9 +5,6 @@ import 'package:responsive_app/content/content_landing.dart';
 import 'package:responsive_app/shared/app_text_styles.dart';
 import 'package:responsive_app/shared/create_account_modal.dart';
 
-// ─────────────────────────────────────────
-// Login Modal  (diseño del mockup)
-// ─────────────────────────────────────────
 class LoginModal extends StatefulWidget {
   final VoidCallback onSuccess;
   final VoidCallback? onCreateAccountTap;
@@ -50,13 +47,14 @@ class _LoginModalState extends State<LoginModal> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
       child: Container(
         width: 380,
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
+          color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: AppColors.borderLight, width: 1.5),
           boxShadow: [
@@ -89,7 +87,7 @@ class _LoginModalState extends State<LoginModal> {
                   style: AppTextStyles.text(
                     fontSize: 22,
                     weight: FontWeight.w600,
-                    color: AppColors.primaryTextLight,
+                    color: isDark ? AppColors.goldLightDark : AppColors.primaryTextLight,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -167,7 +165,7 @@ class _LoginModalState extends State<LoginModal> {
                             style: AppTextStyles.text(
                               fontSize: 17,
                               weight: FontWeight.w600,
-                              color: Colors.white,
+                              color: isDark ? AppColors.goldHighlightDark : Colors.white,
                             ),
                           ),
                   ),
