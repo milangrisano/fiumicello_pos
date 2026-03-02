@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_app/shared/app_colors.dart';
-import 'package:responsive_app/shared/app_text_styles.dart';
-import 'package:responsive_app/view/bar_view.dart';
-import 'package:responsive_app/view/delivery_view.dart';
-import 'package:responsive_app/view/tables_view.dart';
-import 'package:responsive_app/view/takeaway_view.dart';
+import 'package:responsive_app/configure/app_colors.dart';
+import 'package:responsive_app/configure/app_text_styles.dart';
+import 'package:responsive_app/page/sales_pages/view/bar_view.dart';
+import 'package:responsive_app/page/sales_pages/view/delivery_view.dart';
+import 'package:responsive_app/page/sales_pages/view/tables_view.dart';
+import 'package:responsive_app/page/sales_pages/view/takeaway/takeaway_view.dart';
 
 class SalesPage extends StatelessWidget {
   const SalesPage({super.key});

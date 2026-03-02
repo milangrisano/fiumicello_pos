@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_app/shared/app_colors.dart';
+import 'package:responsive_app/configure/app_colors.dart';
 import 'package:responsive_app/router/app_router.dart';
 
 import 'package:provider/provider.dart';
-import 'package:responsive_app/shared/theme_provider.dart';
-import 'package:responsive_app/shared/auth_provider.dart';
+import 'package:responsive_app/provider/theme_provider.dart';
+import 'package:responsive_app/provider/auth_provider.dart';
 
 void main() {
   runApp(

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_app/shared/app_colors.dart';
+import 'package:responsive_app/configure/app_colors.dart';
 
-import 'package:responsive_app/shared/product_grid.dart';
-import 'package:responsive_app/shared/category_pills.dart';
-import 'package:responsive_app/shared/product_swiper.dart'; // Import del nuevo swiper
+import 'package:responsive_app/page/product_page/widget_product/product_grid.dart';
+import 'package:responsive_app/page/product_page/widget_product/category_pills.dart';
+import 'package:responsive_app/page/product_page/widget_product/product_swiper.dart'; // Import del nuevo swiper
 import 'package:go_router/go_router.dart';
 
 // ─────────────────────────────────────────

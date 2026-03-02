@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:responsive_app/shared/app_colors.dart';
+import 'package:responsive_app/configure/app_colors.dart';
 import 'package:responsive_app/content/content_landing.dart';
-import 'package:responsive_app/shared/app_text_styles.dart';
+import 'package:responsive_app/configure/app_text_styles.dart';
 import 'package:responsive_app/shared/create_account_modal.dart';
 
 class LoginModal extends StatefulWidget {

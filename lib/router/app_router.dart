@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:responsive_app/page/sales_page.dart';
+import 'package:responsive_app/page/sales_pages/sales_page.dart';
 import 'package:responsive_app/page/buy_cart_page/cart_page.dart';
 import 'package:responsive_app/responsive/reponsive_layout.dart';
 import 'package:responsive_app/responsive/desktop_scaffold.dart';
 import 'package:responsive_app/responsive/mobile_scaffold.dart';
 import 'package:responsive_app/responsive/tablet_scaffold.dart';
-import 'package:responsive_app/shared/auth_provider.dart';
+import 'package:responsive_app/provider/auth_provider.dart';
 import 'package:responsive_app/shared/login_modal.dart';
 
 // Definimos una clave global para el Navigator, para poder mostrar dialogos

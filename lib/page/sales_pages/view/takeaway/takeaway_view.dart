@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_app/shared/active_order.dart';
-import 'package:responsive_app/shared/app_colors.dart';
-import 'package:responsive_app/shared/app_text_styles.dart';
+import 'package:responsive_app/page/sales_pages/view/takeaway/widget_takeaway/active_order.dart';
+import 'package:responsive_app/configure/app_colors.dart';
+import 'package:responsive_app/configure/app_text_styles.dart';
 import 'package:responsive_app/shared/add_product_modal.dart';
-import '../content/content_takeaway.dart';
-import '../content/content_order_item.dart';
+import '../../../../content/content_takeaway.dart';
+import '../../../../content/content_order_item.dart';
 
 class TakeawayView extends StatefulWidget {
   const TakeawayView({super.key});

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_app/page/landing_page.dart';
-import 'package:responsive_app/shared/app_colors.dart';
-import 'package:responsive_app/shared/app_text_styles.dart';
+import 'package:responsive_app/page/product_page/landing_page.dart';
+import 'package:responsive_app/configure/app_colors.dart';
+import 'package:responsive_app/configure/app_text_styles.dart';
 import 'package:responsive_app/shared/login_modal.dart';
 import 'package:provider/provider.dart';
-import 'package:responsive_app/shared/theme_provider.dart';
-import 'package:responsive_app/shared/auth_provider.dart';
+import 'package:responsive_app/provider/theme_provider.dart';
+import 'package:responsive_app/provider/auth_provider.dart';
 import 'package:go_router/go_router.dart';
 
 class DesktopScaffold extends StatelessWidget {

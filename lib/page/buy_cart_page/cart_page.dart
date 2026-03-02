@@ -3,8 +3,8 @@ import 'package:responsive_app/content/content_landing.dart';
 import 'package:responsive_app/page/buy_cart_page/widget_cart/list_tile_product.dart';
 import 'package:responsive_app/page/buy_cart_page/widget_cart/order_sumary.dart';
 import 'package:responsive_app/page/buy_cart_page/widget_cart/payment_method.dart';
-import 'package:responsive_app/shared/app_colors.dart';
-import 'package:responsive_app/shared/app_text_styles.dart';
+import 'package:responsive_app/configure/app_colors.dart';
+import 'package:responsive_app/configure/app_text_styles.dart';
 import 'package:go_router/go_router.dart';
 
 class CartPage extends StatefulWidget {
