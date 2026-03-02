@@ -7,7 +7,6 @@ import 'package:responsive_app/responsive/desktop_scaffold.dart';
 import 'package:responsive_app/responsive/mobile_scaffold.dart';
 import 'package:responsive_app/responsive/tablet_scaffold.dart';
 import 'package:responsive_app/provider/auth_provider.dart';
-import 'package:responsive_app/shared/login_modal.dart';
 
 // Definimos una clave global para el Navigator, para poder mostrar dialogos
 // desde fuera de un widget específico (o usarla en redirecciones diferidas)
@@ -24,27 +23,6 @@ final GoRouter appRouter = GoRouter(
 
     // Si el usuario intenta entrar a /sales pero no tiene un token JWT guardado
     if (isGoingToSales && !auth.isAuthenticated) {
-      // Diferimos el pintado del Dialog al siguiente frame de UI usando addPostFrameCallback
-      // para evitar errores por intentar pintar dialogs durante la fase de 'build' de GoRouter.
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        final overlayContext = rootNavigatorKey.currentState?.overlay?.context;
-        if (overlayContext != null) {
-          showDialog(
-            context: overlayContext,
-            barrierColor: Colors.black54,
-            builder: (_) => LoginModal(
-              onSuccess: () {
-                // Cerramos el modal
-                Navigator.of(overlayContext).pop();
-                // Simplemente notificamos el login en nuestro proveedor para que 
-                // GoRouter automáticamente re-evalúe la ruta /sales y conceda permisos
-                auth.login("simulated_jwt_token");
-              }
-            ),
-          );
-        }
-      });
-      // Lo redirigimos a home por el momento (pero con el Modal abierto encima)
       return '/'; 
     }
 
@@ -65,41 +43,27 @@ final GoRouter appRouter = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => const ResponsiveLayout(
+      builder: (context, state) => ResponsiveLayout(
         mobileScaffold: MobileScaffold(),
         tabletScaffold: TabletScaffold(),
-        desktopScaffold: DesktopScaffold(),
+        desktopScaffold: const DesktopScaffold(),
       ),
     ),
     GoRoute(
       path: '/cart',
-      builder: (context, state) => const ResponsiveLayout(
-        mobileScaffold: MobileScaffold(body: CartPage()),
-        tabletScaffold: TabletScaffold(body: CartPage()),
-        desktopScaffold: DesktopScaffold(body: CartPage()),
+      builder: (context, state) => ResponsiveLayout(
+        mobileScaffold: MobileScaffold(),
+        tabletScaffold: TabletScaffold(),
+        desktopScaffold: const DesktopScaffold(body: CartPage()),
       ),
     ),
     GoRoute(
       path: '/sales',
-      builder: (context, state) => const ResponsiveLayout(
-        mobileScaffold: MobileScaffold(body: SalesPage()),
-        tabletScaffold: TabletScaffold(body: SalesPage()),
-        desktopScaffold: DesktopScaffold(body: SalesPage()),
+      builder: (context, state) => ResponsiveLayout(
+        mobileScaffold: MobileScaffold(),
+        tabletScaffold: TabletScaffold(),
+        desktopScaffold: const DesktopScaffold(body: SalesPage()),
       ),
-    ),
-    GoRoute(
-      path: '/:category',
-      builder: (context, state) {
-        final category = state.pathParameters['category'];
-        if (category == 'sales') {
-          return const SalesPage();
-        }
-        return ResponsiveLayout(
-          mobileScaffold: MobileScaffold(category: category),
-          tabletScaffold: TabletScaffold(category: category),
-          desktopScaffold: DesktopScaffold(category: category),
-        );
-      },
     ),
   ],
 );
