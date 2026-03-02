@@ -36,21 +36,21 @@ class PaymentMethod extends StatelessWidget {
             value: 0,
             groupValue: selectedValue,
             label: '•••• 4242',
-            iconWidget: _CardLogo('VISA', Colors.blue.shade900),
+            iconWidget: _CardLogo('VISA', Colors.blue.shade900, isSelected: selectedValue == 0),
             onChanged: onChanged,
           ),
           _PaymentOption(
             value: 1,
             groupValue: selectedValue,
             label: 'PSE',
-            iconWidget: _CardLogo('PSE', Colors.teal),
+            iconWidget: _CardLogo('PSE', Colors.teal, isSelected: selectedValue == 1),
             onChanged: onChanged,
           ),
           _PaymentOption(
             value: 2,
             groupValue: selectedValue,
             label: 'Nequi',
-            iconWidget: _CardLogo('nequi', Colors.purple),
+            iconWidget: _CardLogo('nequi', Colors.purple, isSelected: selectedValue == 2),
             onChanged: onChanged,
           ),
         ],
@@ -105,7 +105,8 @@ class _PaymentOption extends StatelessWidget {
 class _CardLogo extends StatelessWidget {
   final String text;
   final Color color;
-  const _CardLogo(this.text, this.color);
+  final bool isSelected;
+  const _CardLogo(this.text, this.color, {this.isSelected = false});
 
   @override
   Widget build(BuildContext context) {
@@ -114,14 +115,17 @@ class _CardLogo extends StatelessWidget {
       height: 25,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isSelected ? AppColors.buttonGreenLight : Colors.white,
         border: Border.all(color: Colors.black12),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Center(
         child: Text(
           text,
-          style: AppTextStyles.bold(fontSize: 12, color: color),
+          style: AppTextStyles.bold(
+            fontSize: 12, 
+            color: isSelected ? Colors.white : color,
+          ),
         ),
       ),
     );
