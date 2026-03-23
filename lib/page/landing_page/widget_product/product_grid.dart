@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_app/configure/app_colors.dart';
 import 'package:responsive_app/configure/app_text_styles.dart';
 import 'package:responsive_app/shared/button_card.dart';
 import 'package:responsive_app/content/content_landing.dart';
@@ -54,11 +53,11 @@ class _ProductGridState extends State<ProductGrid> {
         if (renderObject is RenderBox) {
           // Obtener la posición Y global del elemento
           final position = renderObject.localToGlobal(Offset.zero).dy;
-          
+
           // Calculamos la distancia desde el componente hasta la parte superior con un pequeño offset
           // para que el cambio suceda cuando el titulo este cerca del borde superior.
-          final distance = (position - 150).abs(); 
-          
+          final distance = (position - 150).abs();
+
           if (distance < minDistance) {
             minDistance = distance;
             visibleCategory = entry.key;
@@ -69,12 +68,12 @@ class _ProductGridState extends State<ProductGrid> {
 
     // Scroll ha subido hasta arriba de todo (por encima del primer titulo)
     if (scrollOffset <= 0 && _categoryKeys.isNotEmpty) {
-       widget.onCategoryChange!(_categoryKeys.keys.first);
-       return;
+      widget.onCategoryChange!(_categoryKeys.keys.first);
+      return;
     }
 
     if (visibleCategory != null && visibleCategory != widget.category) {
-       widget.onCategoryChange!(visibleCategory);
+      widget.onCategoryChange!(visibleCategory);
     }
   }
 
@@ -88,7 +87,7 @@ class _ProductGridState extends State<ProductGrid> {
 
   void _scrollToCategory(String categoryName) async {
     _isScrollingProgrammatically = true;
-    
+
     if (_categoryKeys.isNotEmpty && categoryName == _categoryKeys.keys.first) {
       // Scroll to the absolute top for the first category
       await _scrollController.animateTo(
@@ -103,17 +102,17 @@ class _ProductGridState extends State<ProductGrid> {
     final key = _categoryKeys[categoryName];
     if (key != null && key.currentContext != null) {
       final renderBox = key.currentContext!.findRenderObject() as RenderBox;
-      
-      // La posición 'localToGlobal(Offset.zero)' nos da relative position on screen  
-      final positionInViewport = renderBox.localToGlobal(Offset.zero).dy; 
-      
+
+      // La posición 'localToGlobal(Offset.zero)' nos da relative position on screen
+      final positionInViewport = renderBox.localToGlobal(Offset.zero).dy;
+
       // Aumentamos el offset superior para asegurar que el título quede bien visible
       // debajo de las "pills" de categoría y cualquier margin superior que tenga la pantalla.
       final topOffset = 160.0;
-      
+
       final currentScrollOffset = _scrollController.offset;
       var targetOffset = currentScrollOffset + (positionInViewport - topOffset);
-      
+
       // Clamp para no pasarnos de los limites del Scroll
       if (targetOffset < 0) {
         targetOffset = 0;
@@ -127,10 +126,14 @@ class _ProductGridState extends State<ProductGrid> {
         curve: Curves.easeInOutCubic,
       );
     }
-    
+
     // Pequeño delay adicional para asegurar que el scroll ha terminado de asentar
     Future.delayed(const Duration(milliseconds: 100), () {
-      if(mounted) setState(() { _isScrollingProgrammatically = false; });
+      if (mounted) {
+        setState(() {
+          _isScrollingProgrammatically = false;
+        });
+      }
     });
   }
 
@@ -146,7 +149,8 @@ class _ProductGridState extends State<ProductGrid> {
     // Agrupar siempre todos los elementos por categoría respetando el orden original
     final Map<String, List<LandingMenuItem>> groupedItems = {};
     for (final cat in landingCategories) {
-      final catItems = widget.items.where((item) => item.category == cat.name).toList();
+      final catItems =
+          widget.items.where((item) => item.category == cat.name).toList();
       if (catItems.isNotEmpty) {
         groupedItems[cat.name] = catItems;
       }
@@ -155,7 +159,8 @@ class _ProductGridState extends State<ProductGrid> {
     return Theme(
       data: Theme.of(context).copyWith(
         scrollbarTheme: ScrollbarThemeData(
-          thumbColor: WidgetStateProperty.all(AppColors.mutedTextLight),
+          thumbColor:
+              WidgetStateProperty.all(Theme.of(context).colorScheme.outline),
         ),
       ),
       child: Scrollbar(
@@ -181,18 +186,16 @@ class _ProductGridState extends State<ProductGrid> {
       Padding(
         key: _categoryKeys[title],
         padding: const EdgeInsets.only(bottom: 16),
-        child: Builder(
-          builder: (context) {
-            return Text(
-              title,
-              style: AppTextStyles.text(
-                fontSize: 24,
-                weight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            );
-          }
-        ),
+        child: Builder(builder: (context) {
+          return Text(
+            title,
+            style: AppTextStyles.text(
+              fontSize: 24,
+              weight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          );
+        }),
       ),
       GridView.builder(
         shrinkWrap: true,
@@ -210,13 +213,14 @@ class _ProductGridState extends State<ProductGrid> {
   }
 
   /// Construye múltiples bloques de cuadrículas dependiendo de sus categorías
-  List<Widget> _buildGroupedGrids(Map<String, List<LandingMenuItem>> groupedData) {
+  List<Widget> _buildGroupedGrids(
+      Map<String, List<LandingMenuItem>> groupedData) {
     final List<Widget> children = [];
-    
+
     groupedData.forEach((catName, catItems) {
       // Por cada grupo agregar su título y grid pertinente
       children.addAll(_buildSingleGrid(catName, catItems));
-      
+
       // Separación visual entre categorías distintas
       children.add(const SizedBox(height: 32));
     });
@@ -234,7 +238,7 @@ class ProductCard extends StatelessWidget {
   final int textFlex;
 
   const ProductCard({
-    super.key, 
+    super.key,
     required this.item,
     this.imageFlex = 2,
     this.textFlex = 1,
@@ -243,15 +247,16 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark ? AppColors.goldLightDark : AppColors.borderLight,
-          width: 2.0
-        ),
+            color: isDark
+                ? Theme.of(context).colorScheme.secondary
+                : Theme.of(context).colorScheme.outlineVariant,
+            width: 2.0),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.07),
@@ -263,7 +268,7 @@ class ProductCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Imagen 
+          // Imagen
           Expanded(
             flex: imageFlex,
             child: Container(
@@ -280,14 +285,16 @@ class ProductCard extends StatelessWidget {
                   errorBuilder: (context, error, stackTrace) => Container(
                     color: item.plateColor.withValues(alpha: 0.18),
                     child: Center(
-                      child: Icon(Icons.restaurant, size: 56, color: item.plateColor.withValues(alpha: 0.85)),
+                      child: Icon(Icons.restaurant,
+                          size: 56,
+                          color: item.plateColor.withValues(alpha: 0.85)),
                     ),
                   ),
                 ),
               ),
             ),
           ),
-          // Textos 
+          // Textos
           Expanded(
             flex: textFlex,
             child: Padding(
@@ -302,7 +309,9 @@ class ProductCard extends StatelessWidget {
                     style: AppTextStyles.text(
                       fontSize: 13,
                       weight: FontWeight.w600,
-                      color: isDark ? Colors.white : AppColors.primaryTextLight,
+                      color: isDark
+                          ? Colors.white
+                          : Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -313,7 +322,9 @@ class ProductCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: AppTextStyles.text(
                         fontSize: 10,
-                        color: isDark ? Colors.white.withValues(alpha: 0.6) : AppColors.secondaryTextLight,
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.6)
+                            : Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ),
@@ -323,7 +334,9 @@ class ProductCard extends StatelessWidget {
                     style: AppTextStyles.text(
                       fontSize: 14,
                       weight: FontWeight.w700,
-                      color: isDark ? Colors.white : AppColors.primaryTextLight,
+                      color: isDark
+                          ? Colors.white
+                          : Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 6),

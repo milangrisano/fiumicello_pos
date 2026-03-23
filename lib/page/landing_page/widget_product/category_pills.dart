@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_app/configure/app_colors.dart';
 import 'package:responsive_app/configure/app_text_styles.dart';
 
 // ─────────────────────────────────────────
@@ -34,9 +33,9 @@ class CategoryPills extends StatelessWidget {
           Color textColor = colorScheme.onSurface;
 
           if (isSelected) {
-            bgColor = AppColors.surfaceDark;
-            borderColor = AppColors.goldDark;
-            textColor = AppColors.goldDark;
+            bgColor = Theme.of(context).colorScheme.surface;
+            borderColor = Theme.of(context).colorScheme.primary;
+            textColor = Theme.of(context).colorScheme.primary;
           }
 
           return GestureDetector(

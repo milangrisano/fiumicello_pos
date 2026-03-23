@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_app/content/content_products.dart';
-import 'package:responsive_app/configure/app_colors.dart';
 import 'package:responsive_app/configure/app_text_styles.dart';
 
 class AddProductModal extends StatefulWidget {
@@ -32,8 +31,7 @@ class _AddProductModalState extends State<AddProductModal> {
     return productCatalog.where((p) {
       final matchesCategory =
           _selectedCategory == 'Todos' || p.category == _selectedCategory;
-      final matchesSearch =
-          _searchQuery.isEmpty ||
+      final matchesSearch = _searchQuery.isEmpty ||
           p.name.toLowerCase().contains(_searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
     }).toList();
@@ -43,8 +41,8 @@ class _AddProductModalState extends State<AddProductModal> {
   Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.75,
-      decoration: const BoxDecoration(
-        color: AppColors.surfaceDark,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -85,7 +83,8 @@ class _AddProductModalState extends State<AddProductModal> {
               children: [
                 // Order number
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.white10,
                     borderRadius: BorderRadius.circular(8),
@@ -93,11 +92,13 @@ class _AddProductModalState extends State<AddProductModal> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.receipt_long, color: Colors.white38, size: 14),
+                      const Icon(Icons.receipt_long,
+                          color: Colors.white38, size: 14),
                       const SizedBox(width: 5),
                       Text(
                         '#${widget.orderId}',
-                        style: AppTextStyles.pageTitle(fontSize: 12, color: Colors.white54),
+                        style: AppTextStyles.pageTitle(
+                            fontSize: 12, color: Colors.white54),
                       ),
                     ],
                   ),
@@ -107,7 +108,8 @@ class _AddProductModalState extends State<AddProductModal> {
                 Expanded(
                   child: Row(
                     children: [
-                      const Icon(Icons.person_outline, color: Colors.white38, size: 16),
+                      const Icon(Icons.person_outline,
+                          color: Colors.white38, size: 16),
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
@@ -117,7 +119,9 @@ class _AddProductModalState extends State<AddProductModal> {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.edit, color: AppColors.goldDark, size: 16),
+                        icon: Icon(Icons.edit,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 16),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                         tooltip: 'Editar cliente',
@@ -144,11 +148,14 @@ class _AddProductModalState extends State<AddProductModal> {
               style: AppTextStyles.pageTitle(fontSize: 14),
               decoration: InputDecoration(
                 hintText: 'Buscar producto…',
-                hintStyle: AppTextStyles.pageTitle(fontSize: 14, color: Colors.white38),
-                prefixIcon: const Icon(Icons.search, color: Colors.white38, size: 20),
+                hintStyle: AppTextStyles.pageTitle(
+                    fontSize: 14, color: Colors.white38),
+                prefixIcon:
+                    const Icon(Icons.search, color: Colors.white38, size: 20),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear, color: Colors.white38, size: 18),
+                        icon: const Icon(Icons.clear,
+                            color: Colors.white38, size: 18),
                         onPressed: () {
                           _searchController.clear();
                           setState(() => _searchQuery = '');
@@ -181,7 +188,8 @@ class _AddProductModalState extends State<AddProductModal> {
                       final cat = productCategories[i];
                       final isSelected = cat.name == _selectedCategory;
                       return GestureDetector(
-                        onTap: () => setState(() => _selectedCategory = cat.name),
+                        onTap: () =>
+                            setState(() => _selectedCategory = cat.name),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 180),
                           margin: const EdgeInsets.symmetric(
@@ -189,11 +197,17 @@ class _AddProductModalState extends State<AddProductModal> {
                           padding: const EdgeInsets.symmetric(
                               vertical: 10, horizontal: 8),
                           decoration: BoxDecoration(
-                            color: isSelected ? AppColors.goldDark.withValues(alpha: 0.15) : Colors.transparent,
+                            color: isSelected
+                                ? Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withValues(alpha: 0.15)
+                                : Colors.transparent,
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                              color:
-                                  isSelected ? AppColors.goldDark : Colors.transparent,
+                              color: isSelected
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Colors.transparent,
                               width: 1,
                             ),
                           ),
@@ -202,7 +216,7 @@ class _AddProductModalState extends State<AddProductModal> {
                               Icon(
                                 cat.icon,
                                 color: isSelected
-                                    ? AppColors.goldDark
+                                    ? Theme.of(context).colorScheme.primary
                                     : Colors.white38,
                                 size: 22,
                               ),
@@ -213,7 +227,7 @@ class _AddProductModalState extends State<AddProductModal> {
                                 style: AppTextStyles.pageTitle(
                                   fontSize: 11,
                                   color: isSelected
-                                      ? AppColors.goldDark
+                                      ? Theme.of(context).colorScheme.primary
                                       : Colors.white54,
                                 ),
                               ),
@@ -287,11 +301,14 @@ class _ProductCard extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                color: AppColors.goldDark.withValues(alpha: 0.12),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(product.icon,
-                    color: AppColors.goldDark, size: 26),
+                    color: Theme.of(context).colorScheme.primary, size: 26),
               ),
               const SizedBox(height: 8),
               Text(
@@ -305,7 +322,7 @@ class _ProductCard extends StatelessWidget {
               Text(
                 product.price,
                 style: AppTextStyles.w500(
-                    fontSize: 13, color: AppColors.goldDark),
+                    fontSize: 13, color: Theme.of(context).colorScheme.primary),
               ),
             ],
           ),

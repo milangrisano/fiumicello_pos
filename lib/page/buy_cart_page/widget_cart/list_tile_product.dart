@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_app/content/content_landing.dart';
-import 'package:responsive_app/configure/app_colors.dart';
 import 'package:responsive_app/configure/app_text_styles.dart';
 
 class ListTileProduct extends StatelessWidget {
@@ -10,6 +9,7 @@ class ListTileProduct extends StatelessWidget {
   final Function(int) onRemove;
 
   const ListTileProduct({
+    super.key,
     required this.items,
     required this.onIncrement,
     required this.onDecrement,
@@ -25,7 +25,9 @@ class ListTileProduct extends StatelessWidget {
         alignment: Alignment.center,
         child: Text(
           "El carrito está vacío",
-          style: AppTextStyles.w500(fontSize: 18, color: AppColors.secondaryTextLight),
+          style: AppTextStyles.w500(
+              fontSize: 18,
+              color: Theme.of(context).colorScheme.onSurfaceVariant),
         ),
       );
     }
@@ -41,9 +43,9 @@ class ListTileProduct extends StatelessWidget {
 
         return Container(
           decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.goldHighlightDark),
+            border: Border.all(color: Theme.of(context).colorScheme.tertiary),
           ),
           padding: const EdgeInsets.all(12),
           child: Row(
@@ -68,19 +70,25 @@ class ListTileProduct extends StatelessWidget {
                   children: [
                     Text(
                       product.name,
-                      style: AppTextStyles.bold(fontSize: 18, color: isDark ? Colors.white : Colors.black87),
+                      style: AppTextStyles.bold(
+                          fontSize: 18,
+                          color: isDark ? Colors.white : Colors.black87),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       product.description,
-                      style: AppTextStyles.text(fontSize: 13, color: isDark ? Colors.white : Colors.black54),
+                      style: AppTextStyles.text(
+                          fontSize: 13,
+                          color: isDark ? Colors.white : Colors.black54),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 12),
                     Text(
                       product.price,
-                      style: AppTextStyles.bold(fontSize: 16, color: isDark ? Colors.white : Colors.black87),
+                      style: AppTextStyles.bold(
+                          fontSize: 16,
+                          color: isDark ? Colors.white : Colors.black87),
                     ),
                   ],
                 ),
@@ -93,14 +101,20 @@ class ListTileProduct extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      _CircleBtn(icon: Icons.remove, onTap: () => onDecrement(index)),
+                      _CircleBtn(
+                          icon: Icons.remove, onTap: () => onDecrement(index)),
                       const SizedBox(width: 12),
                       Text(
                         '${item.quantity}',
-                        style: AppTextStyles.w500(fontSize: 16, color: isDark ? AppColors.goldHighlightDark : Colors.black87),
+                        style: AppTextStyles.w500(
+                            fontSize: 16,
+                            color: isDark
+                                ? Theme.of(context).colorScheme.tertiary
+                                : Colors.black87),
                       ),
                       const SizedBox(width: 12),
-                      _CircleBtn(icon: Icons.add, onTap: () => onIncrement(index)),
+                      _CircleBtn(
+                          icon: Icons.add, onTap: () => onIncrement(index)),
                     ],
                   ),
                   const SizedBox(height: 32),
@@ -110,11 +124,19 @@ class ListTileProduct extends StatelessWidget {
                       onTap: () => onRemove(index),
                       child: Row(
                         children: [
-                          Icon(Icons.delete_outline, size: 18, color: isDark ? AppColors.goldHighlightDark : Colors.black54),
+                          Icon(Icons.delete_outline,
+                              size: 18,
+                              color: isDark
+                                  ? Theme.of(context).colorScheme.tertiary
+                                  : Colors.black54),
                           const SizedBox(width: 4),
                           Text(
                             LandingStrings.btnDelete,
-                            style: AppTextStyles.w500(fontSize: 14, color: isDark ? AppColors.goldHighlightDark : Colors.black54),
+                            style: AppTextStyles.w500(
+                                fontSize: 14,
+                                color: isDark
+                                    ? Theme.of(context).colorScheme.tertiary
+                                    : Colors.black54),
                           ),
                         ],
                       ),
@@ -134,10 +156,7 @@ class _CircleBtn extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
 
-  const _CircleBtn({
-    required this.icon,
-    required this.onTap
-  });
+  const _CircleBtn({required this.icon, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -149,9 +168,16 @@ class _CircleBtn extends StatelessWidget {
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: isDark ? AppColors.goldHighlightDark :  Colors.black26),
+          border: Border.all(
+              color: isDark
+                  ? Theme.of(context).colorScheme.tertiary
+                  : Colors.black26),
         ),
-        child: Icon(icon, size: 16, color: isDark ? AppColors.goldHighlightDark : Colors.black87),
+        child: Icon(icon,
+            size: 16,
+            color: isDark
+                ? Theme.of(context).colorScheme.tertiary
+                : Colors.black87),
       ),
     );
   }

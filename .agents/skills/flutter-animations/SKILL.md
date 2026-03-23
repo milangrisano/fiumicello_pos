@@ -284,7 +284,7 @@ Hero animations create shared element transitions between screens.
 ```dart
 Hero(
   tag: 'hero-image',
-  child: Image.asset('images/logo.png'),
+  child: Image.asset('images/logo_fiumicello.png'),
 )
 ```
 
@@ -292,7 +292,7 @@ Hero(
 ```dart
 Hero(
   tag: 'hero-image',  // Same tag!
-  child: Image.asset('images/logo.png'),
+  child: Image.asset('images/logo_fiumicello.png'),
 )
 ```
 
@@ -339,7 +339,7 @@ Navigator.of(context).push(
         appBar: AppBar(title: const Text('Detail')),
         body: Center(
           child: PhotoHero(
-            photo: 'images/logo.png',
+            photo: 'images/logo_fiumicello.png',
             width: 300.0,
             onTap: () => Navigator.of(context).pop(),
           ),

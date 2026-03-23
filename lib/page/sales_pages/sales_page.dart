@@ -1,60 +1,195 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_app/configure/app_colors.dart';
-import 'package:responsive_app/configure/app_text_styles.dart';
-import 'package:responsive_app/page/sales_pages/view/bar_view.dart';
-import 'package:responsive_app/page/sales_pages/view/delivery_view.dart';
-import 'package:responsive_app/page/sales_pages/view/tables_view.dart';
-import 'package:responsive_app/page/sales_pages/view/takeaway/takeaway_view.dart';
 
-class SalesPage extends StatelessWidget {
+import 'package:responsive_app/models/product.dart';
+import 'package:responsive_app/services/product_service.dart';
+import 'package:responsive_app/page/sales_pages/widget_pos/pos_sidebar.dart';
+import 'package:responsive_app/page/sales_pages/widget_pos/pos_topbar.dart';
+import 'package:responsive_app/page/sales_pages/widget_pos/pos_product_grid.dart';
+import 'package:responsive_app/page/sales_pages/widget_pos/pos_bottom_bar.dart';
+import 'package:responsive_app/page/sales_pages/widget_pos/pos_order_panel.dart';
+import 'package:responsive_app/models/pos_order.dart';
+
+class SalesPage extends StatefulWidget {
   const SalesPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+  State<SalesPage> createState() => _SalesPageState();
+}
 
-    return DefaultTabController(
-      length: 4,
-      child: Column(
+class _SalesPageState extends State<SalesPage> {
+  String _activeCategory = '';
+  
+  // Lista de órdenes abiertas
+  final List<PosOrder> _openOrders = [];
+  
+  // Índice de la orden seleccionada (null = borrador)
+  int? _selectedOrderIndex;
+  
+  // Borrador de la nueva orden
+  List<PosCartItem> _draftItems = []; 
+  String _draftName = 'Nueva Mesa';
+  
+  // Search state
+  String _searchQuery = '';
+
+  // State del backend
+  List<Product> _products = [];
+  List<String> _categories = [];
+  bool _isLoading = true;
+  String? _errorMessage;
+  final ProductService _productService = ProductService();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
+
+  Future<void> _loadProducts() async {
+    try {
+      final products = await _productService.getProducts();
+      final categories = _productService.extractCategories(products);
+      if (mounted) {
+        setState(() {
+          _products = products;
+          _categories = ['Todos', ...categories];
+          if (_categories.isNotEmpty) {
+            _activeCategory = _categories.first;
+          }
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = e.toString();
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
         children: [
-          Container(
-            color: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
-            child: Material(
-              color: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
-              elevation: 2,
-              child: TabBar(
-                indicator: BoxDecoration(
-                  borderRadius: BorderRadius.circular(50),
-                  color: isDark ? AppColors.goldDark : AppColors.buttonGreenLight,
-                ),
-                indicatorSize: TabBarIndicatorSize.tab,
-                dividerColor: Colors.transparent,
-                labelColor: isDark ? Colors.black87 : Colors.white,
-                unselectedLabelColor: isDark ? Colors.white : AppColors.primaryTextLight,
-                labelStyle: AppTextStyles.bold(fontSize: 18),
-                unselectedLabelStyle: AppTextStyles.w500(fontSize: 18),
-                labelPadding: const EdgeInsets.symmetric(horizontal: 4),
-                tabs: const [
-                  Tab(text: 'Para Llevar'),
-                  Tab(text: 'Domicilios'),
-                  Tab(text: 'Mesas'),
-                  Tab(text: 'Barra'),
-                ],
-              ),
-            ),
+          // Left Sidebar
+          PosSidebar(
+            categories: _isLoading ? [] : _categories,
+            activeCategory: _activeCategory,
+            onCategorySelected: (cat) {
+              setState(() {
+                _activeCategory = cat;
+              });
+            },
           ),
-          const Expanded(
-            child: TabBarView(
+
+          // Main Content
+          Expanded(
+            child: Column(
               children: [
-                TakeawayView(),
-                DeliveryPage(),
-                TablesPage(),
-                BarPage(),
+                // Top Navbar
+                PosTopbar(
+                  isNewOrderSelected: _selectedOrderIndex == null,
+                  onSelectNewOrder: () {
+                    setState(() {
+                      _selectedOrderIndex = null;
+                    });
+                  },
+                  onSearchChanged: (query) {
+                    setState(() {
+                      _searchQuery = query;
+                    });
+                  },
+                ),
+
+                // Active Category Grid
+                Expanded(
+                  child: _isLoading 
+                      ? const Center(child: CircularProgressIndicator())
+                      : _errorMessage != null
+                          ? Center(child: Text('Error: $_errorMessage'))
+                          : PosProductGrid(
+                              searchQuery: _searchQuery,
+                              category: _activeCategory,
+                              products: _products,
+                              onAddProduct: (product) {
+                                setState(() {
+                                  final newItem = PosCartItem(
+                                    product: product, 
+                                    selectedSize: product.category == 'Pizzas' && product.type.isNotEmpty ? product.type : null,
+                                    quantity: 1,
+                                  );
+                                  if (_selectedOrderIndex == null) {
+                                      _draftItems.add(newItem);
+                                  } else {
+                                      _openOrders[_selectedOrderIndex!].items.add(newItem);
+                                  }
+                                });
+                              },
+                            ),
+                ),
+
+                // Bottom Bar (Order Type)
+                PosBottomBar(
+                  openOrders: _openOrders,
+                  selectedIndex: _selectedOrderIndex,
+                  onSelected: (index) {
+                    setState(() {
+                      _selectedOrderIndex = index;
+                    });
+                  },
+                ),
               ],
             ),
           ),
+
+          // Right Order Panel (Cart)
+          PosOrderPanel(
+            orderItems: _selectedOrderIndex == null 
+                ? _draftItems 
+                : _openOrders[_selectedOrderIndex!].items,
+            orderType: _selectedOrderIndex == null 
+                ? _draftName 
+                : _openOrders[_selectedOrderIndex!].name,
+            onNameChanged: (newName) {
+              setState(() {
+                if (_selectedOrderIndex == null) {
+                  _draftName = newName;
+                } else {
+                  _openOrders[_selectedOrderIndex!].name = newName;
+                }
+              });
+            },
+            onPlaceOrder: () {
+              setState(() {
+                if (_selectedOrderIndex == null) {
+                  // Mover draft a open orders
+                  _openOrders.add(PosOrder(
+                    id: '#${451 + _openOrders.length}',
+                    name: _draftName,
+                    items: List.from(_draftItems),
+                  ));
+                  _draftItems = [];
+                  _draftName = 'Nueva Mesa';
+                }
+              });
+            },
+            onPayOrder: () {
+              setState(() {
+                if (_selectedOrderIndex != null) {
+                  // Cobra y elimina la orden abierta
+                  _openOrders.removeAt(_selectedOrderIndex!);
+                  _selectedOrderIndex = null;
+                } else {
+                  // Cobra y resetea el draft
+                  _draftItems = [];
+                  _draftName = 'Nueva Mesa';
+                }
+              });
+            },
+          ),
         ],
-      ),
     );
   }
 }

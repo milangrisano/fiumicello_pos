@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_app/content/content_landing.dart';
-import 'package:responsive_app/configure/app_colors.dart';
 import 'package:responsive_app/configure/app_text_styles.dart';
 
 class OrderSummary extends StatelessWidget {
@@ -10,6 +9,7 @@ class OrderSummary extends StatelessWidget {
   final double total;
 
   const OrderSummary({
+    super.key,
     required this.subtotal,
     required this.tax,
     required this.delivery,
@@ -21,9 +21,9 @@ class OrderSummary extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.goldDark),
+        border: Border.all(color: Theme.of(context).colorScheme.primary),
       ),
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -31,14 +31,23 @@ class OrderSummary extends StatelessWidget {
         children: [
           Text(
             LandingStrings.orderSummary,
-            style: AppTextStyles.text(fontSize: 22, color: isDark ? AppColors.goldHighlightDark : AppColors.primaryTextLight),
+            style: AppTextStyles.text(
+                fontSize: 22,
+                color: isDark
+                    ? Theme.of(context).colorScheme.tertiary
+                    : Theme.of(context).colorScheme.onSurface),
           ),
           const SizedBox(height: 20),
-          _SummaryRow(title: LandingStrings.subtotal, value: '\$${subtotal.toStringAsFixed(2)}'),
+          _SummaryRow(
+              title: LandingStrings.subtotal,
+              value: '\$${subtotal.toStringAsFixed(2)}'),
           const SizedBox(height: 12),
-          _SummaryRow(title: LandingStrings.tax, value: '\$${tax.toStringAsFixed(2)}'),
+          _SummaryRow(
+              title: LandingStrings.tax, value: '\$${tax.toStringAsFixed(2)}'),
           const SizedBox(height: 12),
-          _SummaryRow(title: LandingStrings.delivery, value: '\$${delivery.toStringAsFixed(2)}'),
+          _SummaryRow(
+              title: LandingStrings.delivery,
+              value: '\$${delivery.toStringAsFixed(2)}'),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 16),
             child: Divider(color: Colors.black12, height: 1),
@@ -48,11 +57,19 @@ class OrderSummary extends StatelessWidget {
             children: [
               Text(
                 LandingStrings.total,
-                style: AppTextStyles.bold(fontSize: 20, color: isDark ? AppColors.goldHighlightDark : AppColors.primaryTextLight),
+                style: AppTextStyles.bold(
+                    fontSize: 20,
+                    color: isDark
+                        ? Theme.of(context).colorScheme.tertiary
+                        : Theme.of(context).colorScheme.onSurface),
               ),
               Text(
                 '\$${total.toStringAsFixed(2)}',
-                style: AppTextStyles.bold(fontSize: 20, color: isDark ? AppColors.goldHighlightDark : AppColors.primaryTextLight),
+                style: AppTextStyles.bold(
+                    fontSize: 20,
+                    color: isDark
+                        ? Theme.of(context).colorScheme.tertiary
+                        : Theme.of(context).colorScheme.onSurface),
               ),
             ],
           ),
@@ -62,13 +79,16 @@ class OrderSummary extends StatelessWidget {
             height: 50,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.buttonGreenLight,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8)),
               ),
               onPressed: total == 0 ? null : () {},
               child: Text(
                 LandingStrings.btnCheckout,
-                style: AppTextStyles.w500(fontSize: 16, color: AppColors.goldHighlightDark),
+                style: AppTextStyles.w500(
+                    fontSize: 16,
+                    color: Theme.of(context).colorScheme.tertiary),
               ),
             ),
           )
@@ -90,11 +110,19 @@ class _SummaryRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: AppTextStyles.text(fontSize: 16, color: isDark ? AppColors.goldHighlightDark : AppColors.primaryTextLight)),
-        Text(value, style: AppTextStyles.text(fontSize: 16, color: isDark ? AppColors.goldHighlightDark : AppColors.primaryTextLight)),
+        Text(title,
+            style: AppTextStyles.text(
+                fontSize: 16,
+                color: isDark
+                    ? Theme.of(context).colorScheme.tertiary
+                    : Theme.of(context).colorScheme.onSurface)),
+        Text(value,
+            style: AppTextStyles.text(
+                fontSize: 16,
+                color: isDark
+                    ? Theme.of(context).colorScheme.tertiary
+                    : Theme.of(context).colorScheme.onSurface)),
       ],
     );
   }
 }
-
-

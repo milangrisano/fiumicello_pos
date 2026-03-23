@@ -4,13 +4,11 @@ class InfoTakeaway {
   final String name;
   final String status;
 
-  InfoTakeaway({
-      required this.id,
+  InfoTakeaway(
+      {required this.id,
       required this.time,
       required this.name,
-      required this.status
-    }
-  );
+      required this.status});
 }
 
 List<InfoTakeaway> takeawayContent = [

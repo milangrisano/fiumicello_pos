@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_app/configure/app_colors.dart';
 import 'package:responsive_app/configure/app_text_styles.dart';
 
 class ButtonCard extends StatelessWidget {
@@ -21,8 +20,8 @@ class ButtonCard extends StatelessWidget {
     this.onPressed,
     this.width = double.infinity,
     this.height = 32,
-    this.backgroundColor = AppColors.buttonGreenLight,
-    this.textColor = AppColors.goldHighlightDark,
+    this.backgroundColor,
+    this.textColor,
     this.fontSize = 11,
     this.fontWeight = FontWeight.w400,
     this.borderRadius = 6,
@@ -32,14 +31,18 @@ class ButtonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bg =
+        backgroundColor ?? Theme.of(context).colorScheme.primaryContainer;
+    final txtColor = textColor ?? Theme.of(context).colorScheme.tertiary;
+
     return SizedBox(
       width: width,
       height: height,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor,
-          foregroundColor: textColor,
+          backgroundColor: bg,
+          foregroundColor: txtColor,
           elevation: elevation,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),
@@ -59,7 +62,7 @@ class ButtonCard extends StatelessWidget {
                 text,
                 style: AppTextStyles.text(
                   fontSize: fontSize,
-                  color: textColor ?? Colors.white,
+                  color: txtColor,
                   weight: fontWeight,
                 ),
               ),

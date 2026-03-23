@@ -23,22 +23,14 @@ final GoRouter appRouter = GoRouter(
 
     // Si el usuario intenta entrar a /sales pero no tiene un token JWT guardado
     if (isGoingToSales && !auth.isAuthenticated) {
-      return '/'; 
+      return '/';
     }
 
-    // Si intenta entrar a /sales y SÍ tiene token local, validamos con el Backend
-    // (Esto es opcional si solo quieres validar en el login, pero lo solicitaste expresamente)
-    if (isGoingToSales && auth.isAuthenticated) {
-      final isValid = await auth.verifyTokenWithBackend();
-      if (!isValid) {
-        // El Backend dice que el JWT es inválido o expiró
-        auth.logout(); // Limpiamos el token local
-        return '/'; // Lo pateamos al inicio
-      }
-    }
+    // Si intenta entrar a /sales y SÍ tiene token local, confiamos en la validez
+    // Si la llamada GET del backend lanza 401, el provider expulsará la sesión.
 
     // En cualquier otro caso (cualquier otra ruta, o ruta permitida), déjalo pasar
-    return null; 
+    return null;
   },
   routes: [
     GoRoute(
