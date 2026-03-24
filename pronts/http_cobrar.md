@@ -1,0 +1,1 @@
+Hagamos la conexion con el backend para cuando oprima el boton cobrar suceda lo siguiente,  se despliegue un modal central para escoger el tipo de pago haga la peticion http y se limpie el carrito y las ordenes abiertas

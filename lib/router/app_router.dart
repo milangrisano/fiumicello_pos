@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_app/page/sales_pages/sales_page.dart';
 import 'package:responsive_app/page/buy_cart_page/cart_page.dart';
+import 'package:responsive_app/page/utilities_page/utilities_page.dart';
+import 'package:responsive_app/page/utilities_page/roles_page.dart';
+import 'package:responsive_app/page/utilities_page/users_page.dart';
 import 'package:responsive_app/responsive/reponsive_layout.dart';
 import 'package:responsive_app/responsive/desktop_scaffold.dart';
 import 'package:responsive_app/responsive/mobile_scaffold.dart';
@@ -55,6 +58,30 @@ final GoRouter appRouter = GoRouter(
         mobileScaffold: MobileScaffold(),
         tabletScaffold: TabletScaffold(),
         desktopScaffold: const DesktopScaffold(body: SalesPage()),
+      ),
+    ),
+    GoRoute(
+      path: '/utilities',
+      builder: (context, state) => ResponsiveLayout(
+        mobileScaffold: MobileScaffold(),
+        tabletScaffold: TabletScaffold(),
+        desktopScaffold: const DesktopScaffold(body: UtilitiesPage()),
+      ),
+    ),
+    GoRoute(
+      path: '/roles',
+      builder: (context, state) => ResponsiveLayout(
+        mobileScaffold: MobileScaffold(),
+        tabletScaffold: TabletScaffold(),
+        desktopScaffold: const DesktopScaffold(body: RolesPage()),
+      ),
+    ),
+    GoRoute(
+      path: '/users',
+      builder: (context, state) => ResponsiveLayout(
+        mobileScaffold: MobileScaffold(),
+        tabletScaffold: TabletScaffold(),
+        desktopScaffold: const DesktopScaffold(body: UsersPage()),
       ),
     ),
   ],

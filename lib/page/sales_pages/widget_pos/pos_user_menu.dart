@@ -163,9 +163,11 @@ class _RadialMenuOverlay extends StatelessWidget {
             final items = [
               _ActionItem(icon: Icons.logout, tooltip: 'Logout', action: onLogout),
               _ActionItem(icon: Icons.light_mode_outlined, tooltip: 'Theme', action: onToggleTheme, isThemeToggle: true),
-              _ActionItem(icon: Icons.point_of_sale, tooltip: 'Terminals', action: () {}),
-              _ActionItem(icon: Icons.manage_accounts, tooltip: 'User', action: () {}),
-              _ActionItem(icon: Icons.admin_panel_settings, tooltip: 'Roles', action: () {}),
+              _ActionItem(
+                icon: Icons.settings, 
+                tooltip: 'Útiles', 
+                action: () => context.go('/utilities'),
+              ),
             ];
 
             return Stack(

@@ -115,15 +115,29 @@ class _SalesPageState extends State<SalesPage> {
                               products: _products,
                               onAddProduct: (product) {
                                 setState(() {
-                                  final newItem = PosCartItem(
-                                    product: product, 
-                                    selectedSize: product.category == 'Pizzas' && product.type.isNotEmpty ? product.type : null,
-                                    quantity: 1,
-                                  );
+                                  final selectedSize = product.category == 'Pizzas' && product.type.isNotEmpty ? product.type : null;
+                                  
+                                  void addOrIncrement(List<PosCartItem> items) {
+                                    final existingIndex = items.indexWhere((item) => 
+                                      item.product.id == product.id && 
+                                      item.selectedSize == selectedSize
+                                    );
+                                    
+                                    if (existingIndex != -1) {
+                                      items[existingIndex].quantity += 1;
+                                    } else {
+                                      items.add(PosCartItem(
+                                        product: product,
+                                        selectedSize: selectedSize,
+                                        quantity: 1,
+                                      ));
+                                    }
+                                  }
+
                                   if (_selectedOrderIndex == null) {
-                                      _draftItems.add(newItem);
+                                    addOrIncrement(_draftItems);
                                   } else {
-                                      _openOrders[_selectedOrderIndex!].items.add(newItem);
+                                    addOrIncrement(_openOrders[_selectedOrderIndex!].items);
                                   }
                                 });
                               },
