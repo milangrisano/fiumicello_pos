@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_app/configure/app_text_styles.dart';
+import 'package:responsive_app/page/sales_pages/widget_pos/pos_user_menu.dart';
 
 class UtilitiesPage extends StatelessWidget {
   const UtilitiesPage({super.key});
@@ -34,6 +35,12 @@ class UtilitiesPage extends StatelessWidget {
           'Configuración y Útiles',
           style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 24),
         ),
+        actions: const [
+          Padding(
+            padding: EdgeInsets.only(right: 32.0),
+            child: PosUserMenu(isRightSide: true),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(32.0),

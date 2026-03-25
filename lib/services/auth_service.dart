@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:responsive_app/models/auth_response.dart';
+import 'package:responsive_app/configure/api_config.dart';
 
 class AuthService {
-  final String baseUrl = 'http://localhost:3000';
+  final String baseUrl = ApiConfig.serverUrl;
 
   Future<AuthResponse> login(String email, String password) async {
     try {

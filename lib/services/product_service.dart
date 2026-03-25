@@ -1,13 +1,16 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:responsive_app/models/product.dart';
+import 'package:responsive_app/configure/api_config.dart';
 
 class ProductService {
-  static const String baseUrl = 'http://127.0.0.1:3000/api';
-
   Future<List<Product>> getProducts() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/products'));
+      final headers = await ApiConfig.getHeaders(requireAuth: false);
+      final response = await http.get(
+        Uri.parse('${ApiConfig.baseUrl}/products'),
+        headers: headers,
+      );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);

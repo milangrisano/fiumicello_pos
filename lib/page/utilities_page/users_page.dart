@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_app/configure/app_text_styles.dart';
+import 'package:responsive_app/models/role.dart';
+import 'package:responsive_app/services/role_service.dart';
+import 'package:responsive_app/services/user_service.dart';
+import 'package:responsive_app/page/sales_pages/widget_pos/pos_user_menu.dart';
 
 class UserModel {
   final String id;
   final String name;
   final String email;
   final String phone;
-  final String role;
+  String role;
   final DateTime createdAt;
-  final bool isActive;
+  bool isActive;
 
   UserModel({
     required this.id,
@@ -32,15 +36,44 @@ class UsersPage extends StatefulWidget {
 class _UsersPageState extends State<UsersPage> {
   String _searchQuery = '';
   final bool _isViewingAsAdmin = true; // TODO: Mocked admin privilege
-  
-  final List<UserModel> _allUsers = [
-    UserModel(id: '1', name: 'Juan Perez', email: 'juan@fiumicello.com', phone: '+1234567890', role: 'Administrador', createdAt: DateTime.now().subtract(const Duration(days: 300)), isActive: true),
-    UserModel(id: '2', name: 'Maria Gonzalez', email: 'maria@fiumicello.com', phone: '+1234567891', role: 'Manager', createdAt: DateTime.now().subtract(const Duration(days: 150)), isActive: true),
-    UserModel(id: '3', name: 'Carlos Gomez', email: 'carlos@fiumicello.com', phone: '+1234567892', role: 'Mesero', createdAt: DateTime.now().subtract(const Duration(days: 20)), isActive: true),
-    UserModel(id: '4', name: 'Ana Martinez', email: 'ana@fiumicello.com', phone: '+1234567893', role: 'Cajero', createdAt: DateTime.now().subtract(const Duration(days: 10)), isActive: false),
-    UserModel(id: '5', name: 'Luis Rodriguez', email: 'luis@fiumicello.com', phone: '+1234567894', role: 'Cocinero', createdAt: DateTime.now().subtract(const Duration(days: 5)), isActive: true),
-    UserModel(id: '6', name: 'Roberto Bolaño', email: 'roberto@fiumicello.com', phone: '+1234567895', role: 'Guest', createdAt: DateTime.now().subtract(const Duration(days: 1)), isActive: true),
-  ];
+  List<UserModel> _allUsers = [];
+  List<RoleDefinitionModel> _availableRoles = [];
+  bool _isLoading = true;
+  bool _hasError = false;
+  final UserService _userService = UserService();
+  final RoleService _roleService = RoleService();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUsers();
+  }
+
+  Future<void> _fetchUsers() async {
+    try {
+      final users = await _userService.getUsers();
+      final roles = await _roleService.getRoles();
+      if (mounted) {
+        setState(() {
+          _allUsers = users;
+          _availableRoles = roles.where((r) => r.name.toLowerCase() != 'super admin' && r.name.toLowerCase() != 'admin' && r.name.toLowerCase() != 'administrador').toList();
+          _hasError = false;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _allUsers = [];
+          _hasError = true;
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al cargar datos del servidor: $e')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +101,12 @@ class _UsersPageState extends State<UsersPage> {
           'Directorio de Usuarios',
           style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 24),
         ),
+        actions: const [
+          Padding(
+            padding: EdgeInsets.only(right: 32.0),
+            child: PosUserMenu(isRightSide: true),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 16.0),
@@ -109,7 +148,41 @@ class _UsersPageState extends State<UsersPage> {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
-                  child: SingleChildScrollView(
+                  child: _isLoading 
+                  ? Center(child: CircularProgressIndicator(color: colorScheme.primary))
+                  : _hasError
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.cloud_off, size: 64, color: colorScheme.error),
+                            const SizedBox(height: 16),
+                            Text(
+                              'No se pudo cargar la información de la base de datos.', 
+                              style: AppTextStyles.text(color: colorScheme.onSurfaceVariant),
+                            ),
+                            const SizedBox(height: 24),
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                setState(() {
+                                  _isLoading = true;
+                                  _hasError = false;
+                                });
+                                _fetchUsers();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: colorScheme.primary,
+                                foregroundColor: colorScheme.onPrimary,
+                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              icon: const Icon(Icons.refresh),
+                              label: Text('Reintentar', style: AppTextStyles.bold()),
+                            ),
+                          ],
+                        ),
+                      )
+                  : SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: SingleChildScrollView(
                       child: DataTable(
@@ -236,17 +309,24 @@ class _UsersPageState extends State<UsersPage> {
   }
 
   void _showEditRoleDialog(BuildContext context, UserModel user) {
-    // Roles available to assign (excluding Admin and Super Admin)
-    final List<String> availableRoles = ['Guest', 'Mesero', 'Cajero', 'Cocinero', 'Manager'];
-    
+    if (_availableRoles.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No hay roles disponibles')));
+      return;
+    }
+
     showDialog(
       context: context,
       builder: (context) {
-        String selectedRole = availableRoles.contains(user.role) ? user.role : availableRoles.first;
+        String selectedRoleId = _availableRoles.firstWhere(
+          (r) => r.name == user.role, 
+          orElse: () => _availableRoles.first,
+        ).id;
+        
+        bool isSaving = false;
         final colorScheme = Theme.of(context).colorScheme;
 
         return StatefulBuilder(
-          builder: (context, setState) {
+          builder: (context, setStateModal) {
             return AlertDialog(
               title: Text('Cambiar rol de empleado', style: AppTextStyles.bold(color: colorScheme.onSurface)),
               content: Column(
@@ -258,24 +338,24 @@ class _UsersPageState extends State<UsersPage> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
-                      border: Border.all(color: colorScheme.outlineVariant),
-                      borderRadius: BorderRadius.circular(8),
+                       border: Border.all(color: colorScheme.outlineVariant),
+                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
-                        value: selectedRole,
+                        value: selectedRoleId,
                         isExpanded: true,
                         dropdownColor: Theme.of(context).cardColor,
                         style: AppTextStyles.w500(color: colorScheme.onSurface),
-                        items: availableRoles.map((role) {
-                          return DropdownMenuItem(
-                            value: role,
-                            child: Text(role),
+                        items: _availableRoles.map((role) {
+                          return DropdownMenuItem<String>(
+                            value: role.id,
+                            child: Text(role.name),
                           );
                         }).toList(),
-                        onChanged: (value) {
+                        onChanged: isSaving ? null : (value) {
                           if (value != null) {
-                            setState(() => selectedRole = value);
+                            setStateModal(() => selectedRoleId = value);
                           }
                         },
                       ),
@@ -294,15 +374,36 @@ class _UsersPageState extends State<UsersPage> {
                   child: Text('Cancelar', style: AppTextStyles.bold(color: colorScheme.onSurfaceVariant)),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    // TODO: Implement Role changes API here
-                    Navigator.pop(context);
+                  onPressed: isSaving ? null : () async {
+                    setStateModal(() => isSaving = true);
+                    try {
+                      await _userService.updateUserRole(user.id, selectedRoleId);
+                      
+                      if (mounted) {
+                        setState(() {
+                          user.role = _availableRoles.firstWhere((r) => r.id == selectedRoleId).name;
+                        });
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Rol actualizado correctamente')),
+                        );
+                      }
+                    } catch (e) {
+                      setStateModal(() => isSaving = false);
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error al actualizar: $e')),
+                        );
+                      }
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.primary,
                     foregroundColor: colorScheme.onPrimary,
                   ),
-                  child: Text('Guardar Cambios', style: AppTextStyles.bold()),
+                  child: isSaving 
+                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    : Text('Guardar Cambios', style: AppTextStyles.bold()),
                 ),
               ],
             );

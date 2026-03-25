@@ -69,10 +69,7 @@ class PosSidebar extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Image.asset(
-              'assets/images/fiumicello_hat.png',
-              height: 60,
-            ),
+          const PosUserMenu(),
           Divider(height: 30, thickness: 2),
           Expanded(
             child: ListView.builder(
@@ -124,7 +121,6 @@ class PosSidebar extends StatelessWidget {
               },
             ),
           ),
-          const PosUserMenu(),
           SizedBox(height: 16),
         ],
       ),

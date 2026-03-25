@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:responsive_app/configure/app_text_styles.dart';
 import 'package:responsive_app/models/role.dart';
 import 'package:responsive_app/services/role_service.dart';
+import 'package:responsive_app/page/sales_pages/widget_pos/pos_user_menu.dart';
 
 class RolesPage extends StatefulWidget {
   const RolesPage({super.key});
@@ -14,6 +15,7 @@ class RolesPage extends StatefulWidget {
 class _RolesPageState extends State<RolesPage> {
   List<RoleDefinitionModel> _allRoles = [];
   bool _isLoading = true;
+  bool _hasError = false;
   final RoleService _roleService = RoleService();
 
   @override
@@ -28,25 +30,19 @@ class _RolesPageState extends State<RolesPage> {
       if (mounted) {
         setState(() {
           _allRoles = roles;
+          _hasError = false;
           _isLoading = false;
         });
       }
     } catch (e) {
-      // Si el backend falla, usamos fallback de datos dummy para visualización
       if (mounted) {
         setState(() {
-          _allRoles = [
-            RoleDefinitionModel(id: '1', name: 'Guest', description: 'Acceso básico al menú y catálogo. Sin privilegios transaccionales.', isActive: true),
-            RoleDefinitionModel(id: '2', name: 'Mesero', description: 'Puede crear órdenes, enviarlas a cocina y cobrar en efectivo.', isActive: true),
-            RoleDefinitionModel(id: '3', name: 'Cocinero', description: 'Visibilidad de órdenes entrantes, marcado de finalización de platos.', isActive: true),
-            RoleDefinitionModel(id: '4', name: 'Cajero', description: 'Gestión exclusiva de la caja registradora, devoluciones y cortes Z.', isActive: true),
-            RoleDefinitionModel(id: '5', name: 'Manager', description: 'Supervisor de tienda. Puede promocionar empleados e inventario.', isActive: true),
-            RoleDefinitionModel(id: '6', name: 'Administrador', description: 'Acceso total y configuración de tienda (bloqueado para edición).', isActive: true),
-          ];
+          _allRoles = [];
+          _hasError = true;
           _isLoading = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al conectar con la API. Mostrando datos locales. $e')),
+          SnackBar(content: Text('Error al cargar datos del servidor: $e')),
         );
       }
     }
@@ -73,7 +69,7 @@ class _RolesPageState extends State<RolesPage> {
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 32.0),
+            padding: const EdgeInsets.only(right: 16.0),
             child: ElevatedButton.icon(
               onPressed: () => _showCreateRoleDialog(context),
               style: ElevatedButton.styleFrom(
@@ -85,6 +81,10 @@ class _RolesPageState extends State<RolesPage> {
               icon: const Icon(Icons.add),
               label: Text('Nuevo Rol', style: AppTextStyles.bold()),
             ),
+          ),
+          const Padding(
+            padding: EdgeInsets.only(right: 32.0),
+            child: PosUserMenu(isRightSide: true),
           ),
         ],
       ),
@@ -119,6 +119,38 @@ class _RolesPageState extends State<RolesPage> {
                   borderRadius: BorderRadius.circular(16),
                   child: _isLoading 
                   ? Center(child: CircularProgressIndicator(color: colorScheme.primary))
+                  : _hasError
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.cloud_off, size: 64, color: colorScheme.error),
+                            const SizedBox(height: 16),
+                            Text(
+                              'No se pudo cargar la información de la base de datos.', 
+                              style: AppTextStyles.text(color: colorScheme.onSurfaceVariant),
+                            ),
+                            const SizedBox(height: 24),
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                setState(() {
+                                  _isLoading = true;
+                                  _hasError = false;
+                                });
+                                _fetchRoles();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: colorScheme.primary,
+                                foregroundColor: colorScheme.onPrimary,
+                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              icon: const Icon(Icons.refresh),
+                              label: Text('Reintentar', style: AppTextStyles.bold()),
+                            ),
+                          ],
+                        ),
+                      )
                   : SingleChildScrollView(
                     child: DataTable(
                       headingRowColor: WidgetStateProperty.resolveWith(

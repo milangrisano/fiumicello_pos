@@ -1,13 +1,16 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:responsive_app/models/role.dart';
+import 'package:responsive_app/configure/api_config.dart';
 
 class RoleService {
-  static const String baseUrl = 'http://127.0.0.1:3000/api';
-
   Future<List<RoleDefinitionModel>> getRoles() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/roles'));
+      final headers = await ApiConfig.getHeaders(requireAuth: true);
+      final response = await http.get(
+        Uri.parse('${ApiConfig.baseUrl}/roles'),
+        headers: headers,
+      );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -22,9 +25,10 @@ class RoleService {
 
   Future<RoleDefinitionModel> createRole(String name, String description) async {
     try {
+      final headers = await ApiConfig.getHeaders(requireAuth: true);
       final response = await http.post(
-        Uri.parse('$baseUrl/roles'),
-        headers: {'Content-Type': 'application/json'},
+        Uri.parse('${ApiConfig.baseUrl}/roles'),
+        headers: headers,
         body: json.encode({
           'name': name,
           'description': description,
@@ -45,10 +49,11 @@ class RoleService {
 
   Future<void> updateRoleStatus(String id, bool isActive) async {
     try {
+      final headers = await ApiConfig.getHeaders(requireAuth: true);
+      final endpoint = isActive ? 'activate' : 'deactivate';
       final response = await http.patch(
-        Uri.parse('$baseUrl/roles/$id/deactivate'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({'isActive': isActive}),
+        Uri.parse('${ApiConfig.baseUrl}/roles/$id/$endpoint'),
+        headers: headers,
       );
 
       if (response.statusCode != 200) {

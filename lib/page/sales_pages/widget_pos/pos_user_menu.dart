@@ -6,7 +6,8 @@ import 'package:responsive_app/provider/theme_provider.dart';
 import 'package:go_router/go_router.dart';
 
 class PosUserMenu extends StatefulWidget {
-  const PosUserMenu({super.key});
+  final bool isRightSide;
+  const PosUserMenu({super.key, this.isRightSide = false});
 
   @override
   State<PosUserMenu> createState() => _PosUserMenuState();
@@ -88,6 +89,7 @@ class _PosUserMenuState extends State<PosUserMenu> with SingleTickerProviderStat
           onLogout: _handleLogout,
           onToggleTheme: _handleToggleTheme,
           isDarkMode: currentDarkMode,
+          isRightSide: widget.isRightSide,
         );
       },
     );
@@ -116,11 +118,19 @@ class _PosUserMenuState extends State<PosUserMenu> with SingleTickerProviderStat
             width: 44,
             height: 44,
             child: Center(
-              child: Icon(
-                _isOpen ? Icons.close : Icons.person,
-                color: colorScheme.onSurfaceVariant,
-                size: 24,
-              ),
+              child: _isOpen
+                  ? Icon(
+                      Icons.close,
+                      color: colorScheme.onSurfaceVariant,
+                      size: 24,
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.all(6.0),
+                      child: Image.asset(
+                        'assets/images/fiumicello_hat.png',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
             ),
           ),
         ),
@@ -136,6 +146,7 @@ class _RadialMenuOverlay extends StatelessWidget {
   final VoidCallback onLogout;
   final VoidCallback onToggleTheme;
   final bool isDarkMode;
+  final bool isRightSide;
 
   const _RadialMenuOverlay({
     required this.anchor,
@@ -144,6 +155,7 @@ class _RadialMenuOverlay extends StatelessWidget {
     required this.onLogout,
     required this.onToggleTheme,
     required this.isDarkMode,
+    required this.isRightSide,
   });
 
   @override
@@ -184,7 +196,10 @@ class _RadialMenuOverlay extends StatelessWidget {
   }
 
   Widget _buildRadialItem(BuildContext context, int index, int total, _ActionItem item) {
-    final angle = (index / (total - 1)) * (-math.pi / 2);
+    // Si está a la izquierda (isRightSide = false), se despliega de la derecha (0) a abajo (pi/2).
+    // Si está a la derecha (isRightSide = true), se despliega de abajo (pi/2) a la izquierda (pi).
+    final startAngle = isRightSide ? (math.pi / 2) : 0.0;
+    final angle = startAngle + (index / (total - 1)) * (math.pi / 2);
     final distance = 100.0 * Curves.easeOutBack.transform(controller.value);
 
     final x = math.cos(angle) * distance;
