@@ -4,6 +4,8 @@ import 'package:responsive_app/configure/app_text_styles.dart';
 import 'package:responsive_app/models/role.dart';
 import 'package:responsive_app/services/role_service.dart';
 import 'package:responsive_app/services/user_service.dart';
+import 'package:responsive_app/models/restaurant.dart';
+import 'package:responsive_app/services/restaurant_service.dart';
 import 'package:responsive_app/page/sales_pages/widget_pos/pos_user_menu.dart';
 
 class UserModel {
@@ -38,10 +40,12 @@ class _UsersPageState extends State<UsersPage> {
   final bool _isViewingAsAdmin = true; // TODO: Mocked admin privilege
   List<UserModel> _allUsers = [];
   List<RoleDefinitionModel> _availableRoles = [];
+  List<Restaurant> _availableRestaurants = [];
   bool _isLoading = true;
   bool _hasError = false;
   final UserService _userService = UserService();
   final RoleService _roleService = RoleService();
+  final RestaurantService _restaurantService = RestaurantService();
 
   @override
   void initState() {
@@ -53,10 +57,12 @@ class _UsersPageState extends State<UsersPage> {
     try {
       final users = await _userService.getUsers();
       final roles = await _roleService.getRoles();
+      final restaurants = await _restaurantService.getRestaurants();
       if (mounted) {
         setState(() {
           _allUsers = users;
           _availableRoles = roles.where((r) => r.name.toLowerCase() != 'super admin' && r.name.toLowerCase() != 'admin' && r.name.toLowerCase() != 'administrador').toList();
+          _availableRestaurants = restaurants.where((r) => r.isActive).toList();
           _hasError = false;
           _isLoading = false;
         });
@@ -139,15 +145,62 @@ class _UsersPageState extends State<UsersPage> {
             const SizedBox(height: 32),
             
             Expanded(
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: isDark ? colorScheme.surface : Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: isDark ? colorScheme.outlineVariant : Colors.black12),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
+              child: Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primaryContainer.withOpacity(0.4),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(16),
+                        topRight: Radius.circular(16),
+                      ),
+                      border: Border.all(color: isDark ? colorScheme.outlineVariant : Colors.black12),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.people, color: colorScheme.primary),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Usuarios Registrados',
+                          style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 18),
+                        ),
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: colorScheme.primary,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '${filteredUsers.length} registros',
+                            style: AppTextStyles.bold(color: colorScheme.onPrimary, fontSize: 12),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: isDark ? colorScheme.surface : Colors.white,
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(16),
+                          bottomRight: Radius.circular(16),
+                        ),
+                        border: Border(
+                          left: BorderSide(color: isDark ? colorScheme.outlineVariant : Colors.black12),
+                          right: BorderSide(color: isDark ? colorScheme.outlineVariant : Colors.black12),
+                          bottom: BorderSide(color: isDark ? colorScheme.outlineVariant : Colors.black12),
+                        ),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(16),
+                          bottomRight: Radius.circular(16),
+                        ),
                   child: _isLoading 
                   ? Center(child: CircularProgressIndicator(color: colorScheme.primary))
                   : _hasError
@@ -288,10 +341,13 @@ class _UsersPageState extends State<UsersPage> {
                 ),
               ),
             ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
+      ],
+    ),
+  ),
+);
   }
 
   Color _getRoleColor(String role, ColorScheme colorScheme) {
@@ -322,6 +378,8 @@ class _UsersPageState extends State<UsersPage> {
           orElse: () => _availableRoles.first,
         ).id;
         
+        String? selectedRestaurantId;
+
         bool isSaving = false;
         final colorScheme = Theme.of(context).colorScheme;
 
@@ -361,7 +419,37 @@ class _UsersPageState extends State<UsersPage> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  Text('Asignar a Sucursal:', style: AppTextStyles.text(color: colorScheme.onSurfaceVariant)),
                   const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                       border: Border.all(color: colorScheme.outlineVariant),
+                       borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: selectedRestaurantId,
+                        isExpanded: true,
+                        dropdownColor: Theme.of(context).cardColor,
+                        style: AppTextStyles.w500(color: colorScheme.onSurface),
+                        hint: Text('Selecciona una sucursal', style: AppTextStyles.text(color: colorScheme.onSurfaceVariant)),
+                        items: _availableRestaurants.map((res) {
+                          return DropdownMenuItem<String>(
+                            value: res.id,
+                            child: Text(res.name),
+                          );
+                        }).toList(),
+                        onChanged: isSaving ? null : (value) {
+                          if (value != null) {
+                            setStateModal(() => selectedRestaurantId = value);
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   Text(
                     '* Los roles de "Administrador" solo pueden ser delegados por el Super Administrador.',
                     style: AppTextStyles.text(color: Colors.redAccent, fontSize: 11),
@@ -375,9 +463,13 @@ class _UsersPageState extends State<UsersPage> {
                 ),
                 ElevatedButton(
                   onPressed: isSaving ? null : () async {
+                    if (selectedRestaurantId == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Debe seleccionar una sucursal')));
+                      return;
+                    }
                     setStateModal(() => isSaving = true);
                     try {
-                      await _userService.updateUserRole(user.id, selectedRoleId);
+                      await _userService.updateUserRole(user.id, selectedRoleId, restaurantId: selectedRestaurantId);
                       
                       if (mounted) {
                         setState(() {

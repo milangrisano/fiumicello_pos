@@ -15,9 +15,10 @@ class UtilitiesPage extends StatelessWidget {
       {'title': 'Roles', 'icon': Icons.admin_panel_settings, 'path': '/roles'},
       {'title': 'Restaurants', 'icon': Icons.restaurant, 'path': '/restaurants'},
       {'title': 'Terminal', 'icon': Icons.point_of_sale, 'path': '/terminals'},
+      {'title': 'Categorías', 'icon': Icons.category, 'path': '/categories'},
       {'title': 'Payment Method', 'icon': Icons.credit_card, 'path': '/payment-methods'},
       {'title': 'Sales', 'icon': Icons.receipt_long, 'path': '/sales-history'},
-      {'title': 'Products', 'icon': Icons.inventory, 'path': '/products-manager'},
+      {'title': 'Products', 'icon': Icons.inventory, 'path': '/products'},
       {'title': 'Users', 'icon': Icons.manage_accounts, 'path': '/users'},
     ];
 
@@ -66,7 +67,8 @@ class UtilitiesPage extends StatelessWidget {
 
                   return InkWell(
                     onTap: () {
-                      if (item['path'] == '/roles' || item['path'] == '/users') {
+                      final allowedPaths = ['/roles', '/users', '/payment-methods', '/products', '/restaurants', '/terminals', '/categories'];
+                      if (allowedPaths.contains(item['path'])) {
                         context.go(item['path']);
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(

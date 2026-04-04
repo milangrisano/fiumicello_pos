@@ -5,6 +5,11 @@ import 'package:responsive_app/page/buy_cart_page/cart_page.dart';
 import 'package:responsive_app/page/utilities_page/utilities_page.dart';
 import 'package:responsive_app/page/utilities_page/roles_page.dart';
 import 'package:responsive_app/page/utilities_page/users_page.dart';
+import 'package:responsive_app/page/utilities_page/payment_methods_page.dart';
+import 'package:responsive_app/page/utilities_page/products_page.dart';
+import 'package:responsive_app/page/utilities_page/restaurants_page.dart';
+import 'package:responsive_app/page/utilities_page/terminals_page.dart';
+import 'package:responsive_app/page/utilities_page/categories_page.dart';
 import 'package:responsive_app/responsive/reponsive_layout.dart';
 import 'package:responsive_app/responsive/desktop_scaffold.dart';
 import 'package:responsive_app/responsive/mobile_scaffold.dart';
@@ -82,6 +87,46 @@ final GoRouter appRouter = GoRouter(
         mobileScaffold: MobileScaffold(),
         tabletScaffold: TabletScaffold(),
         desktopScaffold: const DesktopScaffold(body: UsersPage()),
+      ),
+    ),
+    GoRoute(
+      path: '/payment-methods',
+      builder: (context, state) => ResponsiveLayout(
+        mobileScaffold: MobileScaffold(),
+        tabletScaffold: TabletScaffold(),
+        desktopScaffold: const DesktopScaffold(body: PaymentMethodsPage()),
+      ),
+    ),
+    GoRoute(
+      path: '/products',
+      builder: (context, state) => ResponsiveLayout(
+        mobileScaffold: MobileScaffold(),
+        tabletScaffold: TabletScaffold(),
+        desktopScaffold: const DesktopScaffold(body: ProductsPage()),
+      ),
+    ),
+    GoRoute(
+      path: '/restaurants',
+      builder: (context, state) => ResponsiveLayout(
+        mobileScaffold: MobileScaffold(),
+        tabletScaffold: TabletScaffold(),
+        desktopScaffold: const DesktopScaffold(body: RestaurantsPage()),
+      ),
+    ),
+    GoRoute(
+      path: '/terminals',
+      builder: (context, state) => ResponsiveLayout(
+        mobileScaffold: MobileScaffold(),
+        tabletScaffold: TabletScaffold(),
+        desktopScaffold: const DesktopScaffold(body: TerminalsPage()),
+      ),
+    ),
+    GoRoute(
+      path: '/categories',
+      builder: (context, state) => ResponsiveLayout(
+        mobileScaffold: MobileScaffold(),
+        tabletScaffold: TabletScaffold(),
+        desktopScaffold: const DesktopScaffold(body: CategoriesPage()),
       ),
     ),
   ],

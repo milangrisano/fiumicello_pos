@@ -33,13 +33,19 @@ class UserService {
     }
   }
 
-  Future<void> updateUserRole(String userId, String roleId) async {
+  Future<void> updateUserRole(String userId, String roleId, {String? restaurantId}) async {
     try {
       final headers = await ApiConfig.getHeaders(requireAuth: true);
+      
+      final payload = <String, dynamic>{'roleId': int.tryParse(roleId) ?? roleId};
+      if (restaurantId != null && restaurantId.isNotEmpty) {
+        payload['restaurantId'] = restaurantId;
+      }
+      
       final response = await http.patch(
         Uri.parse('${ApiConfig.baseUrl}/users/$userId'),
         headers: headers,
-        body: json.encode({'roleId': int.tryParse(roleId) ?? roleId}),
+        body: json.encode(payload),
       );
 
       if (response.statusCode != 200) {
