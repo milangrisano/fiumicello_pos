@@ -41,7 +41,9 @@ class _LandingPageState extends State<LandingPage> {
 
     if (mounted) {
       if (success) {
-        context.go('/sales');
+        final user = AuthProvider.instance.currentUser;
+        final isGuest = user?.isGuestUser ?? false;
+        context.go(isGuest ? '/guest' : '/sales');
       } else {
         setState(() {
           _loading = false;
@@ -286,7 +288,9 @@ class _LandingPageState extends State<LandingPage> {
                             barrierColor: Colors.black54,
                             builder: (_) => CreateAccountModal(
                               onSuccess: () {
-                                context.go('/sales');
+                                final user = AuthProvider.instance.currentUser;
+                                final isGuest = user?.isGuestUser ?? false;
+                                context.go(isGuest ? '/guest' : '/sales');
                               },
                               onLoginTap: () {
                                 Navigator.of(rootContext).pop();

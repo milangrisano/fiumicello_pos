@@ -14,6 +14,7 @@ class UserModel {
   final String email;
   final String phone;
   String role;
+  String? restaurantName;
   final DateTime createdAt;
   bool isActive;
 
@@ -23,9 +24,32 @@ class UserModel {
     required this.email,
     required this.phone,
     required this.role,
+    this.restaurantName,
     required this.createdAt,
     required this.isActive,
   });
+
+  UserModel copyWith({
+    String? id,
+    String? name,
+    String? email,
+    String? phone,
+    String? role,
+    String? restaurantName,
+    DateTime? createdAt,
+    bool? isActive,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
+      role: role ?? this.role,
+      restaurantName: restaurantName ?? this.restaurantName,
+      createdAt: createdAt ?? this.createdAt,
+      isActive: isActive ?? this.isActive,
+    );
+  }
 }
 
 class UsersPage extends StatefulWidget {
@@ -151,7 +175,7 @@ class _UsersPageState extends State<UsersPage> {
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                     decoration: BoxDecoration(
-                      color: colorScheme.primaryContainer.withOpacity(0.4),
+                      color: colorScheme.primaryContainer.withValues(alpha: 0.4),
                       borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(16),
                         topRight: Radius.circular(16),
@@ -235,109 +259,136 @@ class _UsersPageState extends State<UsersPage> {
                           ],
                         ),
                       )
-                  : SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: SingleChildScrollView(
-                      child: DataTable(
-                        headingRowColor: WidgetStateProperty.resolveWith(
-                          (states) => isDark ? colorScheme.surfaceTint.withValues(alpha: 0.15) : const Color(0xFFF9F9F9),
-                        ),
-                        dataRowMinHeight: 65,
-                        dataRowMaxHeight: 65,
-                        horizontalMargin: 32,
-                        columnSpacing: 40,
-                        columns: [
-                          DataColumn(label: Text('Nombre', style: AppTextStyles.bold(color: colorScheme.onSurface))),
-                          DataColumn(label: Text('Correo / Teléfono', style: AppTextStyles.bold(color: colorScheme.onSurface))),
-                          DataColumn(label: Text('Rol', style: AppTextStyles.bold(color: colorScheme.onSurface))),
-                          DataColumn(label: Text('Creación', style: AppTextStyles.bold(color: colorScheme.onSurface))),
-                          DataColumn(label: Text('Estado', style: AppTextStyles.bold(color: colorScheme.onSurface))),
-                        ],
-                        rows: filteredUsers.map((user) {
-                          return DataRow(
-                            cells: [
-                              DataCell(
-                                Row(
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundColor: colorScheme.primary.withValues(alpha: 0.2),
-                                      child: Text(
-                                        user.name.substring(0, 1).toUpperCase(),
-                                        style: AppTextStyles.bold(color: colorScheme.primary),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Text(user.name, style: AppTextStyles.w500(color: colorScheme.onSurface)),
+                  : LayoutBuilder(
+                      builder: (context, constraints) {
+                        return SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                                child: DataTable(
+                                  headingRowColor: WidgetStateProperty.resolveWith(
+                                    (states) => isDark ? colorScheme.surfaceTint.withValues(alpha: 0.15) : const Color(0xFFF9F9F9),
+                                  ),
+                                  dataRowMinHeight: 65,
+                                  dataRowMaxHeight: 65,
+                                  horizontalMargin: 32,
+                                  columnSpacing: 40,
+                                  columns: [
+                                    DataColumn(label: Text('Nombre', style: AppTextStyles.bold(color: colorScheme.onSurface))),
+                                    DataColumn(label: Text('Correo', style: AppTextStyles.bold(color: colorScheme.onSurface))),
+                                    DataColumn(label: Text('Teléfono', style: AppTextStyles.bold(color: colorScheme.onSurface))),
+                                    DataColumn(label: Text('Sucursal', style: AppTextStyles.bold(color: colorScheme.onSurface))),
+                                    DataColumn(label: Text('Rol', style: AppTextStyles.bold(color: colorScheme.onSurface))),
+                                    DataColumn(label: Text('Creación', style: AppTextStyles.bold(color: colorScheme.onSurface))),
+                                    DataColumn(label: Text('Estado', style: AppTextStyles.bold(color: colorScheme.onSurface))),
                                   ],
-                                ),
-                              ),
-                              DataCell(
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(user.email, style: AppTextStyles.text(color: colorScheme.onSurface)),
-                                    Text(user.phone, style: AppTextStyles.text(color: colorScheme.onSurfaceVariant, fontSize: 12)),
-                                  ],
-                                ),
-                              ),
-                              DataCell(
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: _getRoleColor(user.role.toLowerCase(), colorScheme).withValues(alpha: 0.2),
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                          color: _getRoleColor(user.role.toLowerCase(), colorScheme),
+                                  rows: filteredUsers.map((user) {
+                                    return DataRow(
+                                      key: ValueKey(user.id),
+                                      cells: [
+                                        DataCell(
+                                          Row(
+                                            children: [
+                                              CircleAvatar(
+                                                backgroundColor: colorScheme.primary.withValues(alpha: 0.2),
+                                                child: Text(
+                                                  user.name.substring(0, 1).toUpperCase(),
+                                                  style: AppTextStyles.bold(color: colorScheme.primary),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 16),
+                                              Text(user.name, style: AppTextStyles.w500(color: colorScheme.onSurface)),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      child: Text(
-                                        user.role, 
-                                        style: AppTextStyles.bold(
-                                          color: _getRoleColor(user.role.toLowerCase(), colorScheme),
-                                          fontSize: 12,
+                                        DataCell(Text(user.email, style: AppTextStyles.text(color: colorScheme.onSurface))),
+                                        DataCell(Text(user.phone.isNotEmpty ? user.phone : 'N/A', style: AppTextStyles.text(color: colorScheme.onSurfaceVariant))),
+                                        DataCell(Text(user.restaurantName ?? 'No asignada', style: AppTextStyles.text(color: colorScheme.onSurfaceVariant))),
+                                        DataCell(
+                                          Row(
+                                            children: [
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                                decoration: BoxDecoration(
+                                                  color: _getRoleColor(user.role.toLowerCase(), colorScheme).withValues(alpha: 0.2),
+                                                  borderRadius: BorderRadius.circular(12),
+                                                  border: Border.all(
+                                                    color: _getRoleColor(user.role.toLowerCase(), colorScheme),
+                                                  ),
+                                                ),
+                                                child: Text(
+                                                  user.role, 
+                                                  style: AppTextStyles.bold(
+                                                    color: _getRoleColor(user.role.toLowerCase(), colorScheme),
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ),
+                                              if (_isViewingAsAdmin && user.role.toLowerCase() != 'super admin') ...[
+                                                const SizedBox(width: 8),
+                                                IconButton(
+                                                  icon: const Icon(Icons.edit, size: 16),
+                                                  color: colorScheme.primary,
+                                                  onPressed: () => _showEditRoleDialog(context, user),
+                                                  tooltip: 'Editar Rol',
+                                                ),
+                                              ],
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                                    if (_isViewingAsAdmin && user.role.toLowerCase() != 'super admin') ...[
-                                      const SizedBox(width: 8),
-                                      IconButton(
-                                        icon: const Icon(Icons.edit, size: 16),
-                                        color: colorScheme.primary,
-                                        onPressed: () => _showEditRoleDialog(context, user),
-                                        tooltip: 'Editar Rol',
-                                      ),
-                                    ],
-                                  ],
+                                        DataCell(
+                                          Text('${user.createdAt.day.toString().padLeft(2,'0')}/${user.createdAt.month.toString().padLeft(2,'0')}/${user.createdAt.year}', style: AppTextStyles.text(color: colorScheme.onSurfaceVariant)),
+                                        ),
+                                        DataCell(
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                decoration: BoxDecoration(
+                                                  color: user.isActive ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
+                                                  borderRadius: BorderRadius.circular(12),
+                                                  border: Border.all(
+                                                    color: user.isActive ? Colors.green : Colors.red,
+                                                  ),
+                                                ),
+                                                child: Text(
+                                                  user.isActive ? 'Activo' : 'Inactivo',
+                                                  style: AppTextStyles.bold(
+                                                    color: user.isActive ? Colors.green : Colors.red,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ),
+                                              if (user.role.toLowerCase() != 'super admin') ...[
+                                                const SizedBox(width: 8),
+                                                IconButton(
+                                                  icon: Icon(
+                                                    user.isActive ? Icons.toggle_on : Icons.toggle_off,
+                                                    size: 24,
+                                                  ),
+                                                  color: user.isActive ? Colors.green : Colors.grey,
+                                                  onPressed: () => _toggleUserStatus(user),
+                                                  tooltip: user.isActive ? 'Desactivar' : 'Activar',
+                                                ),
+                                              ],
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  }).toList(),
                                 ),
                               ),
-                              DataCell(
-                                Text('${user.createdAt.day}/${user.createdAt.month}/${user.createdAt.year}', style: AppTextStyles.text(color: colorScheme.onSurfaceVariant)),
-                              ),
-                              DataCell(
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 8,
-                                      height: 8,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: user.isActive ? Colors.green : Colors.red,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(user.isActive ? 'Activo' : 'Inactivo', style: AppTextStyles.text(color: colorScheme.onSurface)),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          );
-                        }).toList(),
-                      ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  ),
                 ),
               ),
             ),
@@ -361,6 +412,43 @@ class _UsersPageState extends State<UsersPage> {
         return colorScheme.outlineVariant;
       default:
         return colorScheme.primary;
+    }
+  }
+
+  Future<void> _toggleUserStatus(UserModel user) async {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    try {
+      final newStatus = !user.isActive;
+      await _userService.updateUserStatus(user.id, newStatus);
+
+      if (!mounted) return;
+      setState(() {
+        final index = _allUsers.indexWhere((u) => u.id == user.id);
+        if (index != -1) {
+          _allUsers[index] = _allUsers[index].copyWith(isActive: newStatus);
+        }
+      });
+      
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            'Usuario ${user.name} ${newStatus ? 'activado' : 'desactivado'}',
+            style: AppTextStyles.text(color: Colors.white),
+          ),
+          backgroundColor: newStatus ? Colors.green : Colors.red,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            'Error al cambiar estado del usuario',
+            style: AppTextStyles.text(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -471,22 +559,20 @@ class _UsersPageState extends State<UsersPage> {
                     try {
                       await _userService.updateUserRole(user.id, selectedRoleId, restaurantId: selectedRestaurantId);
                       
-                      if (mounted) {
-                        setState(() {
-                          user.role = _availableRoles.firstWhere((r) => r.id == selectedRoleId).name;
-                        });
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Rol actualizado correctamente')),
-                        );
-                      }
+                      if (!mounted || !context.mounted) return;
+                      setState(() {
+                        user.role = _availableRoles.firstWhere((r) => r.id == selectedRoleId).name;
+                      });
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Rol actualizado correctamente')),
+                      );
                     } catch (e) {
+                      if (!context.mounted) return;
                       setStateModal(() => isSaving = false);
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Error al actualizar: $e')),
-                        );
-                      }
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error al actualizar: $e')),
+                      );
                     }
                   },
                   style: ElevatedButton.styleFrom(

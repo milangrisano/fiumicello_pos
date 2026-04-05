@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_app/page/sales_pages/sales_page.dart';
 import 'package:responsive_app/page/buy_cart_page/cart_page.dart';
+import 'package:responsive_app/page/guest_page/guest_page.dart';
 import 'package:responsive_app/page/utilities_page/utilities_page.dart';
 import 'package:responsive_app/page/utilities_page/roles_page.dart';
 import 'package:responsive_app/page/utilities_page/users_page.dart';
@@ -26,18 +27,31 @@ final GoRouter appRouter = GoRouter(
   // Le decimos a GoRouter que recalcule las rutas cuando el AuthProvider notifique cambios (Login/Logout)
   refreshListenable: AuthProvider.instance,
   redirect: (context, state) async {
-    final isGoingToSales = state.uri.path == '/sales';
     final auth = AuthProvider.instance;
+    final currentPath = state.uri.path;
 
-    // Si el usuario intenta entrar a /sales pero no tiene un token JWT guardado
-    if (isGoingToSales && !auth.isAuthenticated) {
+    // Si el usuario no está autenticado y va a rutas protegidas, redirigir a home
+    if (!auth.isAuthenticated && currentPath != '/') {
       return '/';
     }
 
-    // Si intenta entrar a /sales y SÍ tiene token local, confiamos en la validez
-    // Si la llamada GET del backend lanza 401, el provider expulsará la sesión.
+    // Si el usuario está autenticado
+    if (auth.isAuthenticated && auth.currentUser != null) {
+      final isGuest = auth.currentUser!.isGuestUser;
 
-    // En cualquier otro caso (cualquier otra ruta, o ruta permitida), déjalo pasar
+      if (isGuest) {
+        // Redirigir SIEMPRE al guest si no está en guest
+        if (currentPath != '/guest') {
+          return '/guest';
+        }
+      } else {
+        // Si no es guest, pero está en la ruta raíz o guest, enviar a sales (o dejarlo estar)
+        if (currentPath == '/' || currentPath == '/guest') {
+          return '/sales';
+        }
+      }
+    }
+
     return null;
   },
   routes: [
@@ -48,6 +62,10 @@ final GoRouter appRouter = GoRouter(
         tabletScaffold: TabletScaffold(),
         desktopScaffold: const DesktopScaffold(),
       ),
+    ),
+    GoRoute(
+      path: '/guest',
+      builder: (context, state) => const GuestPage(),
     ),
     GoRoute(
       path: '/cart',

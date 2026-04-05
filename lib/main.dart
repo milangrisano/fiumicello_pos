@@ -79,3 +79,4 @@ class MainApp extends StatelessWidget {
     );
   }
 }
+//TODO: cuando te logeas en el pos no debe expirar el token si estas logeado pero deberia refrescarse verificar metodo de refresco de token de Fernando Herrera

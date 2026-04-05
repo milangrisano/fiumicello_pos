@@ -44,6 +44,7 @@ class _ProductsPageState extends State<ProductsPage> {
       final categoriesData = await _categoryService.getCategories();
       final restaurantsData = await _restaurantService.getRestaurants();
       final data = await _service.getProducts();
+      data.sort((a, b) => a.id.compareTo(b.id));
       
       if (mounted) {
         setState(() {
@@ -212,13 +213,14 @@ class _ProductsPageState extends State<ProductsPage> {
                                       width: double.infinity,
                                       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                                       decoration: BoxDecoration(
-                                        color: colorScheme.primaryContainer.withOpacity(0.4),
+                                        color: Color.fromRGBO(134, 155, 126, 1),
                                         borderRadius: const BorderRadius.only(
                                           topLeft: Radius.circular(12),
                                           topRight: Radius.circular(12),
                                         ),
-                                        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.5)),
+                                        border: Border.all(color: Color.fromRGBO(134, 155, 126, 1),),
                                       ),
+                                      // Nombre del restaurante y cantidad de productos
                                       child: Row(
                                         children: [
                                           Icon(Icons.storefront, color: colorScheme.primary),
@@ -245,15 +247,15 @@ class _ProductsPageState extends State<ProductsPage> {
                                     // Tabla de productos
                                     Container(
                                       decoration: BoxDecoration(
-                                        color: colorScheme.surface,
+                                        color: Colors.white,
                                         borderRadius: const BorderRadius.only(
                                           bottomLeft: Radius.circular(12),
                                           bottomRight: Radius.circular(12),
                                         ),
                                         border: Border(
-                                          left: BorderSide(color: colorScheme.outlineVariant.withOpacity(0.5)),
-                                          right: BorderSide(color: colorScheme.outlineVariant.withOpacity(0.5)),
-                                          bottom: BorderSide(color: colorScheme.outlineVariant.withOpacity(0.5)),
+                                          left: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                                          right: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                                          bottom: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
                                         ),
                                       ),
                                       child: productsList.isEmpty
@@ -282,7 +284,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                                         child: ConstrainedBox(
                                                           constraints: BoxConstraints(minWidth: constraints.maxWidth),
                                                           child: DataTable(
-                                                            headingRowColor: WidgetStateProperty.all(colorScheme.surfaceContainerHighest.withOpacity(0.3)),
+                                                            headingRowColor: WidgetStateProperty.all(colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)),
                                                             dataRowColor: WidgetStateProperty.all(Colors.transparent),
                                                             columns: [
                                                               DataColumn(label: Text('Nombre', style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 14))),
@@ -293,6 +295,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                                             ],
                                                             rows: productsList.map((product) {
                                                               return DataRow(
+                                                                key: ValueKey(product.id),
                                                                 cells: [
                                                                   DataCell(Text(product.name, style: AppTextStyles.text(color: colorScheme.onSurface, fontSize: 14))),
                                                                   DataCell(Text(product.category.isNotEmpty ? product.category : 'N/A', style: AppTextStyles.text(color: colorScheme.onSurface, fontSize: 14))),
@@ -400,7 +403,7 @@ class _ProductsPageState extends State<ProductsPage> {
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
-                        value: selectedCategoryId,
+                        initialValue: selectedCategoryId,
                         style: AppTextStyles.text(color: colorScheme.onSurface, fontSize: 16),
                         dropdownColor: colorScheme.surface,
                         decoration: InputDecoration(
@@ -419,7 +422,7 @@ class _ProductsPageState extends State<ProductsPage> {
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
-                        value: selectedRestaurantId,
+                        initialValue: selectedRestaurantId,
                         style: AppTextStyles.text(color: colorScheme.onSurface, fontSize: 16),
                         dropdownColor: colorScheme.surface,
                         decoration: InputDecoration(
@@ -494,20 +497,20 @@ class _ProductsPageState extends State<ProductsPage> {
                             } else {
                               await _service.updateProduct(product.id, name, type, categoryId, price, description, restaurantId);
                             }
-                            if (mounted) {
-                              Navigator.pop(context);
-                              _fetchProducts();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(product == null ? 'Producto creado' : 'Producto actualizado')),
-                              );
-                            }
+                            
+                            if (!mounted || !context.mounted) return;
+                            
+                            Navigator.pop(context);
+                            _fetchProducts();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(product == null ? 'Producto creado' : 'Producto actualizado')),
+                            );
                           } catch (e) {
+                            if (!context.mounted) return;
                             setDialogState(() => isSaving = false);
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Error: $e')),
-                              );
-                            }
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Error: $e')),
+                            );
                           }
                         },
                   style: ElevatedButton.styleFrom(
@@ -527,21 +530,43 @@ class _ProductsPageState extends State<ProductsPage> {
   }
 
   Future<void> _toggleStatus(Product product) async {
+    final index = _products.indexOf(product);
+    if (index == -1) return;
+
     final newStatus = !product.isActive;
+    
+    setState(() {
+      _products[index] = Product(
+        id: product.id,
+        name: product.name,
+        type: product.type,
+        categoryId: product.categoryId,
+        category: product.category,
+        restaurantId: product.restaurantId,
+        restaurantName: product.restaurantName,
+        description: product.description,
+        price: product.price,
+        availability: product.availability,
+        isActive: newStatus,
+        createdAt: product.createdAt,
+        updatedAt: DateTime.now(),
+      );
+    });
+
     try {
       await _service.updateProductStatus(product.id, newStatus);
-      _fetchProducts();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Producto ${newStatus ? 'activado' : 'desactivado'}')),
-        );
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Producto ${newStatus ? 'activado' : 'desactivado'}')),
+      );
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al cambiar estado: $e')),
-        );
-      }
+      if (!mounted) return;
+      setState(() {
+        _products[index] = product;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al cambiar estado: $e')),
+      );
     }
   }
 }

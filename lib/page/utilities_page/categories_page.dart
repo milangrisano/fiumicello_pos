@@ -33,6 +33,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
   Future<void> _fetchCategories() async {
     try {
       final data = await _service.getCategories();
+      data.sort((a, b) => a.id.compareTo(b.id));
       if (mounted) {
         setState(() {
           _categories = data;
@@ -56,6 +57,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (!_hasPermissions) {
       return Scaffold(
@@ -138,13 +140,13 @@ class _CategoriesPageState extends State<CategoriesPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Gestión de Categorías',
-                            style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 20),
+                            'Activa o desactiva y edita las categorías para poder asignarlas a los productos.',
+                            style: AppTextStyles.text(color: colorScheme.onSurfaceVariant),
                           ),
                           ElevatedButton.icon(
                             onPressed: () => _showCategoryDialog(),
                             icon: const Icon(Icons.add),
-                            label: const Text('Nueva Categoría'),
+                            label: const Text('Categoría'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: colorScheme.primary,
                               foregroundColor: colorScheme.onPrimary,
@@ -157,9 +159,9 @@ class _CategoriesPageState extends State<CategoriesPage> {
                       Expanded(
                         child: Container(
                           decoration: BoxDecoration(
-                            color: colorScheme.surface,
+                            color: isDark ? colorScheme.surface : Colors.white,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.5)),
+                            border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12),
@@ -174,24 +176,36 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                       child: ConstrainedBox(
                                         constraints: BoxConstraints(minWidth: constraints.maxWidth),
                                         child: DataTable(
-                                          headingRowColor: WidgetStateProperty.all(colorScheme.surfaceContainerHighest.withOpacity(0.3)),
+                                          headingRowColor: WidgetStateProperty.all(Color(0xFF869B7E)),
                                           dataRowColor: WidgetStateProperty.all(Colors.transparent),
                                           columns: [
-                                            DataColumn(label: Text('Nombre', style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 14))),
+                                            DataColumn(label: Row(
+                                              children: [
+                                                Icon(Icons.category, color: colorScheme.primary, size: 20),
+                                                const SizedBox(width: 8),
+                                                Text('Nombre', style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 14)),
+                                              ],
+                                            )),
                                             DataColumn(label: Text('Descripción', style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 14))),
                                             DataColumn(label: Text('Estado', style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 14))),
                                             DataColumn(label: Text('Acciones', style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 14))),
                                           ],
                                           rows: _categories.map((category) {
                                             return DataRow(
+                                              key: ValueKey(category.id),
                                               cells: [
-                                                DataCell(Text(category.name, style: AppTextStyles.text(color: colorScheme.onSurface, fontSize: 14))),
+                                                DataCell(Row(
+                                                  children: [
+                                                    SizedBox(width: 28),
+                                                    Text(category.name, style: AppTextStyles.text(color: colorScheme.onSurface, fontSize: 14)),
+                                                  ],
+                                                )),
                                                 DataCell(Text(category.description ?? '', style: AppTextStyles.text(color: colorScheme.onSurface, fontSize: 14))),
                                                 DataCell(
                                                   Container(
                                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                                     decoration: BoxDecoration(
-                                                      color: category.isActive ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                                                      color: category.isActive ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
                                                       borderRadius: BorderRadius.circular(12),
                                                       border: Border.all(
                                                         color: category.isActive ? Colors.green : Colors.red,
@@ -255,10 +269,10 @@ class _CategoriesPageState extends State<CategoriesPage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) {
+      builder: (dialogContext) {
         return StatefulBuilder(
-          builder: (context, setDialogState) {
-            final colorScheme = Theme.of(context).colorScheme;
+          builder: (innerContext, setDialogState) {
+            final colorScheme = Theme.of(innerContext).colorScheme;
             
             return AlertDialog(
               backgroundColor: colorScheme.surface,
@@ -311,7 +325,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                           final description = descriptionController.text.trim();
 
                           if (name.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
+                            ScaffoldMessenger.of(innerContext).showSnackBar(
                               const SnackBar(content: Text('El nombre es obligatorio')),
                             );
                             return;
@@ -324,17 +338,19 @@ class _CategoriesPageState extends State<CategoriesPage> {
                             } else {
                               await _service.updateCategory(category.id, name, description);
                             }
-                            if (mounted) {
-                              Navigator.pop(context);
-                              _fetchCategories();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(category == null ? 'Categoría creada' : 'Categoría actualizada')),
-                              );
-                            }
+                            
+                            if (!innerContext.mounted) return;
+                            Navigator.pop(innerContext);
+                            
+                            if (!mounted) return;
+                            _fetchCategories();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(category == null ? 'Categoría creada' : 'Categoría actualizada')),
+                            );
                           } catch (e) {
                             setDialogState(() => isSaving = false);
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
+                            if (innerContext.mounted) {
+                              ScaffoldMessenger.of(innerContext).showSnackBar(
                                 SnackBar(content: Text('Error: $e')),
                               );
                             }
@@ -357,10 +373,24 @@ class _CategoriesPageState extends State<CategoriesPage> {
   }
 
   Future<void> _toggleStatus(Category category) async {
+    final index = _categories.indexOf(category);
+    if (index == -1) return;
+
     final newStatus = !category.isActive;
+    
+    setState(() {
+      _categories[index] = Category(
+        id: category.id,
+        name: category.name,
+        description: category.description,
+        isActive: newStatus,
+        createdAt: category.createdAt,
+        updatedAt: DateTime.now(),
+      );
+    });
+
     try {
       await _service.updateCategoryStatus(category.id, newStatus);
-      _fetchCategories();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Categoría ${newStatus ? 'activada' : 'desactivada'}')),
@@ -368,6 +398,9 @@ class _CategoriesPageState extends State<CategoriesPage> {
       }
     } catch (e) {
       if (mounted) {
+        setState(() {
+          _categories[index] = category;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error al cambiar estado: $e')),
         );

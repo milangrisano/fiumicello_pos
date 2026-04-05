@@ -33,6 +33,7 @@ class _TerminalsPageState extends State<TerminalsPage> {
   Future<void> _fetchTerminals() async {
     try {
       final data = await _service.getTerminals();
+      data.sort((a, b) => a.id.compareTo(b.id));
       if (mounted) {
         setState(() {
           _terminals = data;
@@ -56,6 +57,7 @@ class _TerminalsPageState extends State<TerminalsPage> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (!_hasPermissions) {
       return Scaffold(
@@ -138,13 +140,13 @@ class _TerminalsPageState extends State<TerminalsPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Gestión de Terminales',
-                            style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 20),
+                            'Activa o desactiva las terminales para asignarles permisos para realizar tareas en el sistema.',
+                            style: AppTextStyles.text(color: colorScheme.onSurfaceVariant),
                           ),
                           ElevatedButton.icon(
                             onPressed: () => _showTerminalDialog(),
                             icon: const Icon(Icons.add),
-                            label: const Text('Nuevo Terminal'),
+                            label: const Text('Terminal'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: colorScheme.primary,
                               foregroundColor: colorScheme.onPrimary,
@@ -157,9 +159,9 @@ class _TerminalsPageState extends State<TerminalsPage> {
                       Expanded(
                         child: Container(
                           decoration: BoxDecoration(
-                            color: colorScheme.surface,
+                            color: isDark ? colorScheme.surface : Colors.white,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.5)),
+                            border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12),
@@ -174,24 +176,36 @@ class _TerminalsPageState extends State<TerminalsPage> {
                                       child: ConstrainedBox(
                                         constraints: BoxConstraints(minWidth: constraints.maxWidth),
                                         child: DataTable(
-                                          headingRowColor: WidgetStateProperty.all(colorScheme.surfaceContainerHighest.withOpacity(0.3)),
-                                          dataRowColor: WidgetStateProperty.all(Colors.transparent),
+                                          headingRowColor: WidgetStatePropertyAll(Color(0xFF869B7E)),
+                                          dataRowColor: const WidgetStatePropertyAll(Colors.transparent),
                                           columns: [
-                                            DataColumn(label: Text('ID', style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 14))),
+                                            DataColumn(label: Row(
+                                              children: [
+                                                Icon(Icons.point_of_sale, color: colorScheme.primary, size: 20),
+                                                const SizedBox(width: 8),
+                                                Text('ID', style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 14)),
+                                              ],
+                                            )),
                                             DataColumn(label: Text('Nombre', style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 14))),
                                             DataColumn(label: Text('Estado', style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 14))),
                                             DataColumn(label: Text('Acciones', style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 14))),
                                           ],
                                           rows: _terminals.map((terminal) {
                                             return DataRow(
+                                              key: ValueKey(terminal.id),
                                               cells: [
-                                                DataCell(Text(terminal.id.toString(), style: AppTextStyles.text(color: colorScheme.onSurface, fontSize: 14))),
+                                                DataCell(Row(
+                                                  children: [
+                                                    SizedBox(width: 28),
+                                                    Text(terminal.id.toString(), style: AppTextStyles.text(color: colorScheme.onSurface, fontSize: 14)),
+                                                  ],
+                                                )),
                                                 DataCell(Text(terminal.name, style: AppTextStyles.text(color: colorScheme.onSurface, fontSize: 14))),
                                                 DataCell(
                                                   Container(
                                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                                     decoration: BoxDecoration(
-                                                      color: terminal.isActive ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                                                      color: terminal.isActive ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
                                                       borderRadius: BorderRadius.circular(12),
                                                       border: Border.all(
                                                         color: terminal.isActive ? Colors.green : Colors.red,
@@ -310,20 +324,20 @@ class _TerminalsPageState extends State<TerminalsPage> {
                             } else {
                               await _service.updateTerminal(terminal.id, name);
                             }
-                            if (mounted) {
-                              Navigator.pop(context);
-                              _fetchTerminals();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(terminal == null ? 'Terminal creado' : 'Terminal actualizado')),
-                              );
-                            }
+                            
+                            if (!mounted || !context.mounted) return;
+                            
+                            Navigator.pop(context);
+                            _fetchTerminals();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(terminal == null ? 'Terminal creado' : 'Terminal actualizado')),
+                            );
                           } catch (e) {
+                            if (!context.mounted) return;
                             setDialogState(() => isSaving = false);
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Error: $e')),
-                              );
-                            }
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Error: $e')),
+                            );
                           }
                         },
                   style: ElevatedButton.styleFrom(
@@ -343,21 +357,35 @@ class _TerminalsPageState extends State<TerminalsPage> {
   }
 
   Future<void> _toggleStatus(Terminal terminal) async {
+    final index = _terminals.indexOf(terminal);
+    if (index == -1) return;
+
     final newStatus = !terminal.isActive;
+    
+    setState(() {
+      _terminals[index] = Terminal(
+        id: terminal.id,
+        name: terminal.name,
+        isActive: newStatus,
+        createdAt: terminal.createdAt,
+        updatedAt: DateTime.now(),
+      );
+    });
+
     try {
       await _service.updateTerminalStatus(terminal.id, newStatus);
-      _fetchTerminals();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Terminal ${newStatus ? 'activado' : 'desactivado'}')),
-        );
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Terminal ${newStatus ? 'activado' : 'desactivado'}')),
+      );
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al cambiar estado: $e')),
-        );
-      }
+      if (!mounted) return;
+      setState(() {
+        _terminals[index] = terminal;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al cambiar estado: $e')),
+      );
     }
   }
 }

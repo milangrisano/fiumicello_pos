@@ -15,6 +15,12 @@ class User {
     this.roles = const [],
   });
 
+  bool get isGuestUser {
+    if (roles.isEmpty) return true;
+    final r = roles.first.trim().toLowerCase();
+    return roles.length == 1 && (r == 'guest' || r.contains('guest'));
+  }
+
   factory User.fromJson(Map<String, dynamic> json) {
     // Manejar casos donde el backend envía firstName y lastName
     final String firstName = json['firstName'] ?? '';
@@ -26,12 +32,18 @@ class User {
     List<String> userRoles = [];
     if (json['role'] != null) {
       if (json['role'] is Map && json['role']['name'] != null) {
-        userRoles.add(json['role']['name']);
+        userRoles.add(json['role']['name'].toString());
       } else if (json['role'] is String) {
-        userRoles.add(json['role']);
+        userRoles.add(json['role'].toString());
       }
     } else if (json['roles'] != null) {
-      userRoles = List<String>.from(json['roles']);
+      final rolesList = json['roles'] as List<dynamic>?;
+      if (rolesList != null) {
+        userRoles = rolesList.map((e) {
+          if (e is Map && e['name'] != null) return e['name'].toString();
+          return e.toString();
+        }).toList();
+      }
     }
 
     return User(

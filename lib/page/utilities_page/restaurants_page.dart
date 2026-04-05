@@ -33,6 +33,7 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
   Future<void> _fetchRestaurants() async {
     try {
       final data = await _service.getRestaurants();
+      data.sort((a, b) => a.id.compareTo(b.id));
       if (mounted) {
         setState(() {
           _restaurants = data;
@@ -56,6 +57,7 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (!_hasPermissions) {
       return Scaffold(
@@ -138,13 +140,13 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Gestión de Restaurantes',
-                            style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 20),
+                            'Puedes agregar nuevos restaurantes, editar los existentes y activar o desactivar si lo requieres.',
+                            style: AppTextStyles.text(color: colorScheme.onSurfaceVariant, fontSize: 16),
                           ),
                           ElevatedButton.icon(
                             onPressed: () => _showRestaurantDialog(),
                             icon: const Icon(Icons.add),
-                            label: const Text('Nuevo Restaurante'),
+                            label: const Text('Restaurante'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: colorScheme.primary,
                               foregroundColor: colorScheme.onPrimary,
@@ -157,9 +159,9 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
                       Expanded(
                         child: Container(
                           decoration: BoxDecoration(
-                            color: colorScheme.surface,
+                            color: isDark ? colorScheme.surface : Colors.white,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.5)),
+                            border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12),
@@ -174,10 +176,16 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
                                       child: ConstrainedBox(
                                         constraints: BoxConstraints(minWidth: constraints.maxWidth),
                                         child: DataTable(
-                                          headingRowColor: WidgetStateProperty.all(colorScheme.surfaceContainerHighest.withOpacity(0.3)),
+                                          headingRowColor: WidgetStatePropertyAll(Color.fromRGBO(134, 155, 126, 1)),
                                           dataRowColor: WidgetStateProperty.all(Colors.transparent),
                                           columns: [
-                                            DataColumn(label: Text('Nombre', style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 14))),
+                                            DataColumn(label: Row(
+                                              children: [
+                                                Icon(Icons.storefront, color: colorScheme.primary),
+                                                SizedBox(width: 10),
+                                                Text('Nombre', style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 14)),
+                                              ],
+                                            )),
                                             DataColumn(label: Text('Ciudad', style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 14))),
                                             DataColumn(label: Text('Dirección', style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 14))),
                                             DataColumn(label: Text('Estado', style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 14))),
@@ -185,6 +193,7 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
                                           ],
                                           rows: _restaurants.map((restaurant) {
                                             return DataRow(
+                                              key: ValueKey(restaurant.id),
                                               cells: [
                                                 DataCell(Text(restaurant.name, style: AppTextStyles.text(color: colorScheme.onSurface, fontSize: 14))),
                                                 DataCell(Text(restaurant.city.isNotEmpty ? restaurant.city : 'N/A', style: AppTextStyles.text(color: colorScheme.onSurface, fontSize: 14))),
@@ -193,7 +202,7 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
                                                   Container(
                                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                                     decoration: BoxDecoration(
-                                                      color: restaurant.isActive ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                                                      color: restaurant.isActive ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
                                                       borderRadius: BorderRadius.circular(12),
                                                       border: Border.all(
                                                         color: restaurant.isActive ? Colors.green : Colors.red,
@@ -338,20 +347,20 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
                             } else {
                               await _service.updateRestaurant(restaurant.id, name, city, address);
                             }
-                            if (mounted) {
-                              Navigator.pop(context);
-                              _fetchRestaurants();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(restaurant == null ? 'Restaurante creado' : 'Restaurante actualizado')),
-                              );
-                            }
+                            
+                            if (!mounted || !context.mounted) return;
+                            
+                            Navigator.pop(context);
+                            _fetchRestaurants();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(restaurant == null ? 'Restaurante creado' : 'Restaurante actualizado')),
+                            );
                           } catch (e) {
+                            if (!context.mounted) return;
                             setDialogState(() => isSaving = false);
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Error: $e')),
-                              );
-                            }
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Error: $e')),
+                            );
                           }
                         },
                   style: ElevatedButton.styleFrom(
@@ -371,21 +380,37 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
   }
 
   Future<void> _toggleStatus(Restaurant restaurant) async {
+    final index = _restaurants.indexOf(restaurant);
+    if (index == -1) return;
+
     final newStatus = !restaurant.isActive;
+    
+    setState(() {
+      _restaurants[index] = Restaurant(
+        id: restaurant.id,
+        name: restaurant.name,
+        city: restaurant.city,
+        address: restaurant.address,
+        isActive: newStatus,
+        createdAt: restaurant.createdAt,
+        updatedAt: DateTime.now(),
+      );
+    });
+
     try {
       await _service.updateRestaurantStatus(restaurant.id, newStatus);
-      _fetchRestaurants();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Restaurante ${newStatus ? 'activado' : 'desactivado'}')),
-        );
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Restaurante ${newStatus ? 'activado' : 'desactivado'}')),
+      );
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al cambiar estado: $e')),
-        );
-      }
+      if (!mounted) return;
+      setState(() {
+        _restaurants[index] = restaurant;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al cambiar estado: $e')),
+      );
     }
   }
 }

@@ -27,6 +27,7 @@ class _RolesPageState extends State<RolesPage> {
   Future<void> _fetchRoles() async {
     try {
       final roles = await _roleService.getRoles();
+      roles.sort((a, b) => a.id.compareTo(b.id));
       if (mounted) {
         setState(() {
           _allRoles = roles;
@@ -68,20 +69,6 @@ class _RolesPageState extends State<RolesPage> {
           style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 24),
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: ElevatedButton.icon(
-              onPressed: () => _showCreateRoleDialog(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colorScheme.primary,
-                foregroundColor: colorScheme.onPrimary,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              icon: const Icon(Icons.add),
-              label: Text('Nuevo Rol', style: AppTextStyles.bold()),
-            ),
-          ),
           const Padding(
             padding: EdgeInsets.only(right: 32.0),
             child: PosUserMenu(isRightSide: true),
@@ -93,12 +80,27 @@ class _RolesPageState extends State<RolesPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Activa o desactiva los roles en la base de datos para impedir que los managers puedan delegarlos.',
-              style: AppTextStyles.text(color: colorScheme.onSurfaceVariant),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Activa o desactiva los roles para asignarles permisos para realizar tareas en el sistema.',
+                  style: AppTextStyles.text(color: colorScheme.onSurfaceVariant),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () => _showCreateRoleDialog(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  icon: const Icon(Icons.add),
+                  label: Text('Rol', style: AppTextStyles.bold()),
+                ),
+              ],
             ),
-            const SizedBox(height: 32),
-            
+            const SizedBox(height: 32),            
             Expanded(
               child: Container(
                 width: double.infinity,
@@ -153,26 +155,33 @@ class _RolesPageState extends State<RolesPage> {
                       )
                   : SingleChildScrollView(
                     child: DataTable(
-                      headingRowColor: WidgetStateProperty.resolveWith(
-                        (states) => isDark ? colorScheme.surfaceTint.withValues(alpha: 0.15) : const Color(0xFFF9F9F9),
+                      headingRowColor: WidgetStatePropertyAll(
+                        isDark ? colorScheme.surfaceTint.withValues(alpha: 0.15) : const Color.fromRGBO(134, 155, 126, 1),
                       ),
                       dataRowMinHeight: 70,
                       dataRowMaxHeight: 70,
                       horizontalMargin: 32,
                       columnSpacing: 48,
                       columns: [
-                        DataColumn(label: Text('Nombre del Rol', style: AppTextStyles.bold(color: colorScheme.onSurface))),
+                        
+                        DataColumn(label: Row(
+                          children: [
+                            Icon(Icons.shield, color: colorScheme.primary, size: 20),
+                            const SizedBox(width: 12),
+                            Text('Nombre del Rol', style: AppTextStyles.bold(color: colorScheme.onSurface)),
+                          ],
+                        )),
                         DataColumn(label: Text('Descripción', style: AppTextStyles.bold(color: colorScheme.onSurface))),
                         DataColumn(label: Text('Estado de Activación', style: AppTextStyles.bold(color: colorScheme.onSurface))),
                       ],
                       rows: _allRoles.map((role) {
                         return DataRow(
+                          key: ValueKey(role.id),
                           cells: [
                             DataCell(
                               Row(
                                 children: [
-                                  Icon(Icons.shield, color: colorScheme.primary, size: 20),
-                                  const SizedBox(width: 12),
+                                  const SizedBox(width: 32),
                                   Text(role.name, style: AppTextStyles.bold(color: colorScheme.onSurface)),
                                 ],
                               ),
@@ -198,8 +207,8 @@ class _RolesPageState extends State<RolesPage> {
                                       )
                                     : Switch(
                                         value: role.isActive,
-                                        activeTrackColor: colorScheme.primary.withValues(alpha: 0.5),
-                                        activeThumbColor: colorScheme.primary,
+                                        activeTrackColor: Colors.green,
+                                        activeThumbColor: colorScheme.onInverseSurface,
                                         onChanged: (bool value) async {
                                           final originalValue = role.isActive;
                                           setState(() => role.isActive = value);
@@ -221,7 +230,7 @@ class _RolesPageState extends State<RolesPage> {
                                   Text(
                                     role.isActive ? 'Activo' : 'Inactivo',
                                     style: AppTextStyles.w500(
-                                      color: role.isActive ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                                      color: role.isActive ? Colors.green : colorScheme.onSurfaceVariant,
                                     ),
                                   ),
                                 ],

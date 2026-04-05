@@ -33,6 +33,7 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
   Future<void> _fetchMethods() async {
     try {
       final data = await _service.getPaymentMethods();
+      data.sort((a, b) => a.id.compareTo(b.id));
       if (mounted) {
         setState(() {
           _methods = data;
@@ -112,8 +113,8 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Gestión de Métodos de Pago',
-                  style: AppTextStyles.w500(color: colorScheme.onSurfaceVariant, fontSize: 16),
+                  'Activa o desactiva y edita los métodos de pago que utilizaras para registrar las ventas.',
+                  style: AppTextStyles.text(color: colorScheme.onSurfaceVariant),
                 ),
                 ElevatedButton.icon(
                   onPressed: () => _showMethodDialog(context),
@@ -124,7 +125,7 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   icon: const Icon(Icons.add),
-                  label: Text('Crear Método', style: AppTextStyles.bold()),
+                  label: Text('Método', style: AppTextStyles.bold()),
                 ),
               ],
             ),
@@ -175,13 +176,19 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
                                     constraints: BoxConstraints(minWidth: constraints.maxWidth),
                                     child: SingleChildScrollView(
                                       child: DataTable(
-                                  headingRowColor: WidgetStateProperty.resolveWith(
-                                    (states) => isDark
+                                  headingRowColor: WidgetStatePropertyAll(
+                                    isDark
                                         ? colorScheme.surfaceTint.withValues(alpha: 0.15)
-                                        : const Color(0xFFF9F9F9),
+                                        : const Color(0xFF869B7E),
                                   ),
                                   columns: [
-                                    DataColumn(label: Text('ID', style: AppTextStyles.bold(color: colorScheme.onSurface))),
+                                    DataColumn(label: Row(
+                                      children: [
+                                        Icon(Icons.credit_card, color: colorScheme.primary, size: 20),
+                                        const SizedBox(width: 8),
+                                        Text('ID', style: AppTextStyles.bold(color: colorScheme.onSurface)),
+                                      ],
+                                    )),
                                     DataColumn(label: Text('Nombre', style: AppTextStyles.bold(color: colorScheme.onSurface))),
                                     DataColumn(label: Text('Creación', style: AppTextStyles.bold(color: colorScheme.onSurface))),
                                     DataColumn(label: Text('Estado', style: AppTextStyles.bold(color: colorScheme.onSurface))),
@@ -189,24 +196,33 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
                                   ],
                                   rows: _methods.map((method) {
                                     return DataRow(
+                                      key: ValueKey(method.id),
                                       cells: [
-                                        DataCell(Text(method.id.toString(), style: AppTextStyles.text(color: colorScheme.onSurfaceVariant))),
+                                        DataCell(Row(
+                                          children: [
+                                            SizedBox(width: 28),
+                                            Text(method.id.toString(), style: AppTextStyles.text(color: colorScheme.onSurfaceVariant)),
+                                          ],
+                                        )),
                                         DataCell(Text(method.name, style: AppTextStyles.w500(color: colorScheme.onSurface))),
                                         DataCell(Text('${method.createdAt.day}/${method.createdAt.month}/${method.createdAt.year}', style: AppTextStyles.text(color: colorScheme.onSurfaceVariant))),
                                         DataCell(
-                                          Row(
-                                            children: [
-                                              Container(
-                                                width: 8,
-                                                height: 8,
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: method.isActive ? Colors.green : Colors.red,
-                                                ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: method.isActive ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
+                                              borderRadius: BorderRadius.circular(12),
+                                              border: Border.all(
+                                                color: method.isActive ? Colors.green : Colors.red,
                                               ),
-                                              const SizedBox(width: 8),
-                                              Text(method.isActive ? 'Activo' : 'Inactivo', style: AppTextStyles.text(color: colorScheme.onSurface)),
-                                            ],
+                                            ),
+                                            child: Text(
+                                              method.isActive ? 'Activo' : 'Inactivo',
+                                              style: AppTextStyles.bold(
+                                                color: method.isActive ? Colors.green : Colors.red,
+                                                fontSize: 12,
+                                              ),
+                                            ),
                                           ),
                                         ),
                                         DataCell(
@@ -299,12 +315,16 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
                       } else {
                         await _service.createPaymentMethod(nameController.text.trim());
                       }
+                      
+                      if (!mounted || !context.mounted) return;
+                      
                       Navigator.pop(context);
                       _fetchMethods();
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text(isEditing ? 'Método de pago actualizado' : 'Método de pago creado')),
                       );
                     } catch (e) {
+                      if (!context.mounted) return;
                       setStateModal(() => isSaving = false);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Error: $e')),
@@ -328,13 +348,33 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
   }
 
   Future<void> _toggleStatus(PaymentMethod method) async {
+    final index = _methods.indexOf(method);
+    if (index == -1) return;
+
+    final newStatus = !method.isActive;
+    
+    setState(() {
+      _methods[index] = PaymentMethod(
+        id: method.id,
+        name: method.name,
+        isActive: newStatus,
+        createdAt: method.createdAt,
+        updatedAt: DateTime.now(),
+      );
+    });
+
     try {
-      await _service.updatePaymentMethodStatus(method.id, !method.isActive);
-      _fetchMethods();
+      await _service.updatePaymentMethodStatus(method.id, newStatus);
+      
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Estado actualizado satisfactoriamente')),
+        const SnackBar(content: Text('Estado actualizado satisfactoriamente')),
       );
     } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _methods[index] = method;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al cambiar estado: $e')),
       );

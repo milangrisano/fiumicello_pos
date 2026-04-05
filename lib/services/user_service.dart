@@ -21,6 +21,7 @@ class UserService {
             email: json['email'] ?? '',
             phone: json['phone'] ?? '',
             role: _extractRole(json['role']),
+            restaurantName: json['restaurant'] != null ? json['restaurant']['name'] : null,
             createdAt: json['createdAt'] != null ? DateTime.tryParse(json['createdAt']) ?? DateTime.now() : DateTime.now(),
             isActive: json['isActive'] ?? true,
           );
@@ -53,6 +54,26 @@ class UserService {
       }
     } catch (e) {
       throw Exception('Error updating user role: $e');
+    }
+  }
+
+  Future<void> updateUserStatus(String userId, bool isActive) async {
+    try {
+      final headers = await ApiConfig.getHeaders(requireAuth: true);
+      
+      final payload = <String, dynamic>{'isActive': isActive};
+      
+      final response = await http.patch(
+        Uri.parse('${ApiConfig.baseUrl}/users/$userId'),
+        headers: headers,
+        body: json.encode(payload),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to update user status: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error updating user status: $e');
     }
   }
 
