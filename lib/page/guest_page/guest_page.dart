@@ -153,9 +153,8 @@ class _GuestPageState extends State<GuestPage>
               TextButton.icon(
                 onPressed: () async {
                   await AuthProvider.instance.logout();
-                  if (mounted) {
-                    context.go('/');
-                  }
+                  if (!context.mounted) return;
+                  context.go('/');
                 },
                 icon: Icon(Icons.logout_rounded,
                     color: colorScheme.error, size: 18),

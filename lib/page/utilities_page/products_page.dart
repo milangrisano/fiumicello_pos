@@ -159,7 +159,7 @@ class _ProductsPageState extends State<ProductsPage> {
                           ElevatedButton.icon(
                             onPressed: () => _showProductDialog(),
                             icon: const Icon(Icons.add),
-                            label: const Text('Nuevo Producto'),
+                            label: const Text('Producto'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: colorScheme.primary,
                               foregroundColor: colorScheme.onPrimary,
