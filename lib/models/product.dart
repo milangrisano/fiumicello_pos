@@ -49,7 +49,7 @@ class Product {
       restaurantId: json['restaurant'] != null ? (json['restaurant']['id'] ?? '') : '',
       restaurantName: json['restaurant'] != null ? (json['restaurant']['name'] ?? '') : '',
       description: json['description'] as String? ?? '',
-      price: (json['price'] as num).toDouble(),
+      price: double.tryParse(json['price'].toString()) ?? 0.0,
       availability: json['availability'] as bool? ?? true,
       isActive: json['isActive'] as bool? ?? true,
       createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,

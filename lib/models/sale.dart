@@ -36,7 +36,7 @@ class SaleModel {
 
     return SaleModel(
       id: json['id']?.toString() ?? '',
-      total: (json['total'] ?? 0).toDouble(),
+      total: double.tryParse(json['total']?.toString() ?? '0') ?? 0.0,
       status: json['status']?.toString() ?? 'completed',
       paymentMethod: parsedPaymentMethod ?? 'Efectivo',
       createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : DateTime.now(),
