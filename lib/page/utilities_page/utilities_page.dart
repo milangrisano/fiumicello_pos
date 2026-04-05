@@ -67,7 +67,16 @@ class UtilitiesPage extends StatelessWidget {
 
                   return InkWell(
                     onTap: () {
-                      final allowedPaths = ['/roles', '/users', '/payment-methods', '/products', '/restaurants', '/terminals', '/categories'];
+                      final allowedPaths = [
+                        '/roles', 
+                        '/users', 
+                        '/payment-methods', 
+                        '/products', 
+                        '/restaurants', 
+                        '/terminals', 
+                        '/categories',
+                        '/sales-history',
+                      ];
                       if (allowedPaths.contains(item['path'])) {
                         context.go(item['path']);
                       } else {

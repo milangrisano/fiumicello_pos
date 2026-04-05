@@ -11,6 +11,7 @@ import 'package:responsive_app/page/utilities_page/products_page.dart';
 import 'package:responsive_app/page/utilities_page/restaurants_page.dart';
 import 'package:responsive_app/page/utilities_page/terminals_page.dart';
 import 'package:responsive_app/page/utilities_page/categories_page.dart';
+import 'package:responsive_app/page/utilities_page/sales_history_page.dart';
 import 'package:responsive_app/responsive/reponsive_layout.dart';
 import 'package:responsive_app/responsive/desktop_scaffold.dart';
 import 'package:responsive_app/responsive/mobile_scaffold.dart';
@@ -81,6 +82,14 @@ final GoRouter appRouter = GoRouter(
         mobileScaffold: MobileScaffold(),
         tabletScaffold: TabletScaffold(),
         desktopScaffold: const DesktopScaffold(body: SalesPage()),
+      ),
+    ),
+    GoRoute(
+      path: '/sales-history',
+      builder: (context, state) => ResponsiveLayout(
+        mobileScaffold: MobileScaffold(),
+        tabletScaffold: TabletScaffold(),
+        desktopScaffold: const DesktopScaffold(body: SalesHistoryPage()),
       ),
     ),
     GoRoute(
