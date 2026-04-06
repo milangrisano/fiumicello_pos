@@ -58,7 +58,7 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
     final filteredSales = _allSales.where((sale) {
       final query = _searchQuery.toLowerCase();
       final idMatch = sale.id.toLowerCase().contains(query);
-      final customerMatch = (sale.customerName ?? '').toLowerCase().contains(query);
+      final customerMatch = (sale.dinerName ?? '').toLowerCase().contains(query);
       final methodMatch = (sale.paymentMethod ?? '').toLowerCase().contains(query);
       
       return idMatch || customerMatch || methodMatch;
@@ -294,7 +294,7 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
                                         ),
                                       ),
                                       DataCell(Text(dateFormatter.format(sale.createdAt), style: AppTextStyles.text(color: colorScheme.onSurfaceVariant))),
-                                      DataCell(Text(sale.customerName ?? 'Mostrador', style: AppTextStyles.text(color: colorScheme.onSurface))),
+                                      DataCell(Text(sale.dinerName ?? 'Mostrador', style: AppTextStyles.text(color: colorScheme.onSurface))),
                                       DataCell(
                                         Row(
                                           children: [

@@ -190,9 +190,28 @@ class _KitchenDisplayPageState extends State<KitchenDisplayPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  sale.tableName ?? 'Mesa Desconocida',
-                  style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 18),
+                Expanded(
+                  child: Row(
+                    children: [
+                      if (sale.orderType == 'DELIVERY') ...[
+                        Icon(Icons.two_wheeler, color: colorScheme.primary, size: 20),
+                        const SizedBox(width: 8),
+                      ] else if (sale.orderType == 'TAKEAWAY') ...[
+                        Icon(Icons.takeout_dining, color: colorScheme.primary, size: 20),
+                        const SizedBox(width: 8),
+                      ] else ...[
+                        Icon(Icons.table_restaurant, color: colorScheme.primary, size: 20),
+                        const SizedBox(width: 8),
+                      ],
+                      Expanded(
+                        child: Text(
+                          _getTicketTitle(sale),
+                          style: AppTextStyles.bold(color: colorScheme.onSurface, fontSize: 18),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -251,5 +270,16 @@ class _KitchenDisplayPageState extends State<KitchenDisplayPage> {
         ),
       ),
     );
+  }
+
+  String _getTicketTitle(SaleModel sale) {
+    final invoice = sale.invoiceNumber != null ? '#${sale.invoiceNumber}' : '';
+    if (sale.orderType == 'DELIVERY') {
+      return 'Delivery $invoice - ${sale.dinerName ?? "Sin Nombre"}';
+    } else if (sale.orderType == 'TAKEAWAY') {
+      return '${sale.dinerName ?? "Cliente"} $invoice - Para Llevar';
+    } else {
+      return sale.tableName ?? 'Mesa Desconocida';
+    }
   }
 }

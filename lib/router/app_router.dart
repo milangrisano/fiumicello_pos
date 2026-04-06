@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_app/page/sales_pages/sales_page.dart';
+import 'package:responsive_app/page/sales_pages/floor_plan_page.dart';
 import 'package:responsive_app/page/buy_cart_page/cart_page.dart';
 import 'package:responsive_app/page/guest_page/guest_page.dart';
 import 'package:responsive_app/page/utilities_page/utilities_page.dart';
@@ -13,6 +14,7 @@ import 'package:responsive_app/page/utilities_page/terminals_page.dart';
 import 'package:responsive_app/page/utilities_page/categories_page.dart';
 import 'package:responsive_app/page/utilities_page/sales_history_page.dart';
 import 'package:responsive_app/page/utilities_page/kitchen_display_page.dart';
+import 'package:responsive_app/page/utilities_page/tables_page.dart';
 import 'package:responsive_app/responsive/reponsive_layout.dart';
 import 'package:responsive_app/responsive/desktop_scaffold.dart';
 import 'package:responsive_app/responsive/mobile_scaffold.dart';
@@ -82,8 +84,21 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => ResponsiveLayout(
         mobileScaffold: MobileScaffold(),
         tabletScaffold: TabletScaffold(),
-        desktopScaffold: const DesktopScaffold(body: SalesPage()),
+        desktopScaffold: const DesktopScaffold(body: FloorPlanPage()),
       ),
+    ),
+    GoRoute(
+      path: '/sales/pos',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        return ResponsiveLayout(
+          mobileScaffold: MobileScaffold(),
+          tabletScaffold: TabletScaffold(),
+          desktopScaffold: DesktopScaffold(body: SalesPage(
+            orderParams: extra,
+          )),
+        );
+      },
     ),
     GoRoute(
       path: '/sales-history',
@@ -163,6 +178,14 @@ final GoRouter appRouter = GoRouter(
         mobileScaffold: MobileScaffold(),
         tabletScaffold: TabletScaffold(),
         desktopScaffold: const DesktopScaffold(body: KitchenDisplayPage()),
+      ),
+    ),
+    GoRoute(
+      path: '/tables',
+      builder: (context, state) => ResponsiveLayout(
+        mobileScaffold: MobileScaffold(),
+        tabletScaffold: TabletScaffold(),
+        desktopScaffold: const DesktopScaffold(body: TablesPage()),
       ),
     ),
   ],

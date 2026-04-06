@@ -41,4 +41,46 @@ class SalesService {
       throw Exception('Excepción al conectar con el servidor: $e');
     }
   }
+
+  Future<SaleModel> createSale(Map<String, dynamic> data) async {
+    try {
+      final headers = await ApiConfig.getHeaders(requireAuth: true);
+      headers['Content-Type'] = 'application/json';
+
+      final response = await http.post(
+        Uri.parse('${ApiConfig.baseUrl}/sales'),
+        headers: headers,
+        body: json.encode(data),
+      );
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return SaleModel.fromJson(json.decode(response.body));
+      } else {
+        throw Exception('Error al crear venta: Código ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Excepción al conectar con el servidor: $e');
+    }
+  }
+
+  Future<SaleModel> addItems(String saleId, List<Map<String, dynamic>> items) async {
+    try {
+      final headers = await ApiConfig.getHeaders(requireAuth: true);
+      headers['Content-Type'] = 'application/json';
+
+      final response = await http.post(
+        Uri.parse('${ApiConfig.baseUrl}/sales/$saleId/items'),
+        headers: headers,
+        body: json.encode({'items': items}),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return SaleModel.fromJson(json.decode(response.body));
+      } else {
+        throw Exception('Error al añadir items: Código ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Excepción al conectar con el servidor: $e');
+    }
+  }
 }

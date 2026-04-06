@@ -21,6 +21,7 @@ class UtilitiesPage extends StatelessWidget {
       {'title': 'Products', 'icon': Icons.inventory, 'path': '/products'},
       {'title': 'Users', 'icon': Icons.manage_accounts, 'path': '/users'},
       {'title': 'Cocina', 'icon': Icons.kitchen, 'path': '/kitchen'},
+      {'title': 'Mesas', 'icon': Icons.table_restaurant, 'path': '/tables'},
     ];
 
     return Scaffold(

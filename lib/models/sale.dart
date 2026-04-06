@@ -23,8 +23,10 @@ class SaleModel {
   final String status;
   final String? paymentMethod;
   final DateTime createdAt;
-  final String? customerName;
+  final String? dinerName;
   final String? tableName;
+  final String orderType;
+  final int? invoiceNumber;
   final List<SaleDetailModel> items;
 
   SaleModel({
@@ -33,8 +35,10 @@ class SaleModel {
     required this.status,
     this.paymentMethod,
     required this.createdAt,
-    this.customerName,
+    this.dinerName,
     this.tableName,
+    this.orderType = 'DINE_IN',
+    this.invoiceNumber,
     this.items = const [],
   });
 
@@ -49,12 +53,12 @@ class SaleModel {
       }
     }
 
-    // Manejo de customerName
-    String? parsedCustomerName;
-    if (json['customerName'] != null) {
-      parsedCustomerName = json['customerName'].toString();
+    // Manejo de dinerName
+    String? parsedDinerName;
+    if (json['dinerName'] != null) {
+      parsedDinerName = json['dinerName'].toString();
     } else if (json['customer'] != null && json['customer'] is Map) {
-      parsedCustomerName = json['customer']['name']?.toString();
+      parsedDinerName = json['customer']['name']?.toString();
     }
 
     String? parsedTableName;
@@ -75,8 +79,10 @@ class SaleModel {
       status: json['status']?.toString() ?? 'completed',
       paymentMethod: parsedPaymentMethod ?? 'Efectivo',
       createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : DateTime.now(),
-      customerName: parsedCustomerName,
+      dinerName: parsedDinerName,
       tableName: parsedTableName,
+      orderType: json['orderType']?.toString() ?? 'DINE_IN',
+      invoiceNumber: json['invoiceNumber'] != null ? int.tryParse(json['invoiceNumber'].toString()) : null,
       items: parsedItems,
     );
   }
