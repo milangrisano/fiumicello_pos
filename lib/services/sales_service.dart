@@ -22,4 +22,23 @@ class SalesService {
       throw Exception('Excepción al conectar con el servidor: $e');
     }
   }
+
+  Future<void> updateStatus(String id, String status) async {
+    try {
+      final headers = await ApiConfig.getHeaders(requireAuth: true);
+      headers['Content-Type'] = 'application/json';
+      
+      final response = await http.patch(
+        Uri.parse('${ApiConfig.baseUrl}/sales/$id/status'),
+        headers: headers,
+        body: json.encode({'status': status}),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Error al actualizar estado: Código ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Excepción al conectar con el servidor: $e');
+    }
+  }
 }

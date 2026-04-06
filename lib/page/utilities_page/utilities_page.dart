@@ -20,6 +20,7 @@ class UtilitiesPage extends StatelessWidget {
       {'title': 'Sales', 'icon': Icons.receipt_long, 'path': '/sales-history'},
       {'title': 'Products', 'icon': Icons.inventory, 'path': '/products'},
       {'title': 'Users', 'icon': Icons.manage_accounts, 'path': '/users'},
+      {'title': 'Cocina', 'icon': Icons.kitchen, 'path': '/kitchen'},
     ];
 
     return Scaffold(
@@ -76,6 +77,7 @@ class UtilitiesPage extends StatelessWidget {
                         '/terminals', 
                         '/categories',
                         '/sales-history',
+                        '/kitchen',
                       ];
                       if (allowedPaths.contains(item['path'])) {
                         context.go(item['path']);
