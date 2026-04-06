@@ -79,6 +79,7 @@ class UtilitiesPage extends StatelessWidget {
                         '/categories',
                         '/sales-history',
                         '/kitchen',
+                        '/tables',
                       ];
                       if (allowedPaths.contains(item['path'])) {
                         context.go(item['path']);
