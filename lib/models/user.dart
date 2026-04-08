@@ -5,6 +5,7 @@ class User {
   final bool isActive;
   final bool isEmailVerified;
   final List<String> roles;
+  final List<String> permissions;
 
   User({
     required this.id,
@@ -13,12 +14,18 @@ class User {
     this.isActive = true,
     this.isEmailVerified = false,
     this.roles = const [],
+    this.permissions = const [],
   });
 
   bool get isGuestUser {
     if (roles.isEmpty) return true;
     final r = roles.first.trim().toLowerCase();
     return roles.length == 1 && (r == 'guest' || r.contains('guest'));
+  }
+
+  bool hasPermission(String key) {
+    if (permissions.contains('all')) return true;
+    return permissions.contains(key);
   }
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -30,9 +37,16 @@ class User {
 
     // Manejar el formato de un único role
     List<String> userRoles = [];
+    List<String> userPermissions = [];
+    
     if (json['role'] != null) {
-      if (json['role'] is Map && json['role']['name'] != null) {
-        userRoles.add(json['role']['name'].toString());
+      if (json['role'] is Map) {
+        if (json['role']['name'] != null) {
+          userRoles.add(json['role']['name'].toString());
+        }
+        if (json['role']['permissions'] != null) {
+           userPermissions = List<String>.from(json['role']['permissions']);
+        }
       } else if (json['role'] is String) {
         userRoles.add(json['role'].toString());
       }
@@ -53,6 +67,7 @@ class User {
       isActive: json['isActive'] ?? true,
       isEmailVerified: json['isEmailVerified'] ?? false,
       roles: userRoles,
+      permissions: userPermissions,
     );
   }
 
@@ -64,6 +79,7 @@ class User {
       'isActive': isActive,
       'isEmailVerified': isEmailVerified,
       'roles': roles,
+      'permissions': permissions,
     };
   }
 }

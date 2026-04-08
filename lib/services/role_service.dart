@@ -63,4 +63,23 @@ class RoleService {
       throw Exception('Error updating role status: $e');
     }
   }
+
+  Future<void> updateRolePermissions(String id, List<String> permissions) async {
+    try {
+      final headers = await ApiConfig.getHeaders(requireAuth: true);
+      final response = await http.patch(
+        Uri.parse('${ApiConfig.baseUrl}/roles/$id/permissions'),
+        headers: headers,
+        body: json.encode({
+          'permissions': permissions,
+        }),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to update role permissions: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error updating role permissions: $e');
+    }
+  }
 }

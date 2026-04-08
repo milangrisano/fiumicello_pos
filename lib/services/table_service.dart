@@ -4,9 +4,12 @@ import 'package:responsive_app/models/table.dart';
 import 'package:responsive_app/configure/api_config.dart';
 
 class TableService {
-  Future<List<TableModel>> getTables() async {
+  Future<List<TableModel>> getTables({String? restaurantId}) async {
     final headers = await ApiConfig.getHeaders(requireAuth: true);
-    final response = await http.get(Uri.parse('${ApiConfig.baseUrl}/tables'), headers: headers);
+    final uri = restaurantId != null 
+        ? Uri.parse('${ApiConfig.baseUrl}/tables?restaurantId=$restaurantId')
+        : Uri.parse('${ApiConfig.baseUrl}/tables');
+    final response = await http.get(uri, headers: headers);
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);

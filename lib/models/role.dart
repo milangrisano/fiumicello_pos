@@ -3,12 +3,14 @@ class RoleDefinitionModel {
   final String name;
   final String description;
   bool isActive;
+  List<String> permissions;
 
   RoleDefinitionModel({
     required this.id,
     required this.name,
     required this.description,
     required this.isActive,
+    required this.permissions,
   });
 
   factory RoleDefinitionModel.fromJson(Map<String, dynamic> json) {
@@ -17,6 +19,9 @@ class RoleDefinitionModel {
       name: json['name'] ?? '',
       description: json['description'] ?? '',
       isActive: json['isActive'] ?? true,
+      permissions: json['permissions'] != null 
+          ? List<String>.from(json['permissions']) 
+          : [],
     );
   }
 
@@ -26,6 +31,7 @@ class RoleDefinitionModel {
       'name': name,
       'description': description,
       'isActive': isActive,
+      'permissions': permissions,
     };
   }
 }

@@ -4,6 +4,7 @@ import 'package:responsive_app/configure/app_text_styles.dart';
 import 'package:responsive_app/models/role.dart';
 import 'package:responsive_app/services/role_service.dart';
 import 'package:responsive_app/page/sales_pages/widget_pos/pos_user_menu.dart';
+import 'package:responsive_app/page/utilities_page/role_permissions_modal.dart';
 
 class RolesPage extends StatefulWidget {
   const RolesPage({super.key});
@@ -163,7 +164,6 @@ class _RolesPageState extends State<RolesPage> {
                       horizontalMargin: 32,
                       columnSpacing: 48,
                       columns: [
-                        
                         DataColumn(label: Row(
                           children: [
                             Icon(Icons.shield, color: colorScheme.primary, size: 20),
@@ -172,7 +172,8 @@ class _RolesPageState extends State<RolesPage> {
                           ],
                         )),
                         DataColumn(label: Text('Descripción', style: AppTextStyles.bold(color: colorScheme.onSurface))),
-                        DataColumn(label: Text('Estado de Activación', style: AppTextStyles.bold(color: colorScheme.onSurface))),
+                        DataColumn(label: Text('Estado', style: AppTextStyles.bold(color: colorScheme.onSurface))),
+                        DataColumn(label: Text('Acciones', style: AppTextStyles.bold(color: colorScheme.onSurface))),
                       ],
                       rows: _allRoles.map((role) {
                         return DataRow(
@@ -200,7 +201,7 @@ class _RolesPageState extends State<RolesPage> {
                             DataCell(
                               Row(
                                 children: [
-                                  role.name.toLowerCase() == 'administrador'
+                                  role.name.toLowerCase() == 'administrador' || role.name.toLowerCase() == 'super admin'
                                     ? Padding(
                                         padding: const EdgeInsets.only(left: 14.0),
                                         child: Icon(Icons.lock, color: colorScheme.outlineVariant, size: 20),
@@ -234,6 +235,31 @@ class _RolesPageState extends State<RolesPage> {
                                     ),
                                   ),
                                 ],
+                              ),
+                            ),
+                            DataCell(
+                              ElevatedButton.icon(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => RolePermissionsModal(
+                                      role: role,
+                                      onSaved: (newPermissions) {
+                                        setState(() {
+                                          role.permissions = newPermissions;
+                                        });
+                                      },
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: colorScheme.surfaceContainerHighest,
+                                  foregroundColor: colorScheme.onSurface,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                ),
+                                icon: const Icon(Icons.vpn_key, size: 18),
+                                label: Text('Accesos', style: AppTextStyles.bold(fontSize: 12)),
                               ),
                             ),
                           ],

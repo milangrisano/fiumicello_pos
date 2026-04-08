@@ -15,6 +15,7 @@ import 'package:responsive_app/page/utilities_page/categories_page.dart';
 import 'package:responsive_app/page/utilities_page/sales_history_page.dart';
 import 'package:responsive_app/page/utilities_page/kitchen_display_page.dart';
 import 'package:responsive_app/page/utilities_page/tables_page.dart';
+import 'package:responsive_app/page/utilities_page/global_sales_stats_page.dart';
 import 'package:responsive_app/responsive/reponsive_layout.dart';
 import 'package:responsive_app/responsive/desktop_scaffold.dart';
 import 'package:responsive_app/responsive/mobile_scaffold.dart';
@@ -41,7 +42,8 @@ final GoRouter appRouter = GoRouter(
 
     // Si el usuario está autenticado
     if (auth.isAuthenticated && auth.currentUser != null) {
-      final isGuest = auth.currentUser!.isGuestUser;
+      final user = auth.currentUser!;
+      final isGuest = user.isGuestUser;
 
       if (isGuest) {
         // Redirigir SIEMPRE al guest si no está en guest
@@ -49,9 +51,49 @@ final GoRouter appRouter = GoRouter(
           return '/guest';
         }
       } else {
-        // Si no es guest, pero está en la ruta raíz o guest, enviar a sales (o dejarlo estar)
-        if (currentPath == '/' || currentPath == '/guest') {
+        // Validaciones finas por permisos
+        
+        // Kitchen access
+        if (currentPath == '/kitchen' && !user.hasPermission('kitchen:view')) {
+          return '/sales'; // Fallback to sales
+        }
+        
+        // Utilities access
+        if (currentPath.startsWith('/utilities') || 
+            currentPath == '/roles' || 
+            currentPath == '/users' || 
+            currentPath == '/payment-methods' ||
+            currentPath == '/products' ||
+            currentPath == '/restaurants' ||
+            currentPath == '/terminals' ||
+            currentPath == '/categories' ||
+            currentPath == '/sales-history' ||
+            currentPath == '/global-stats') {
+          // If they try to enter utilities without any access
+          if (!user.hasPermission('utilities:access') && 
+              !user.hasPermission('sales:view_history') && 
+              !user.hasPermission('tables:manage')) {
+            // First allowed fallback is Kitchen if they only have kitchen view
+            if (user.hasPermission('kitchen:view')) return '/kitchen';
+            return '/sales'; 
+          }
+        }
+        
+        // Tables manage
+        if (currentPath == '/tables' && !user.hasPermission('tables:manage')) {
+          if (user.hasPermission('kitchen:view')) return '/kitchen';
           return '/sales';
+        }
+        
+        // Sales routing logic
+        if (currentPath == '/' || currentPath == '/guest') {
+          // Si el usuario tiene acceso a Ventas, que vaya a Ventas. Si no, pero a Kitchen sí, redirigir a Kitchen.
+          if (user.hasPermission('sales:manage') || user.hasPermission('tables:view') || user.hasPermission('sales:manage_active_payments')) {
+             return '/sales';
+          } else if (user.hasPermission('kitchen:view')) {
+             return '/kitchen';
+          }
+          return '/sales'; // Default assumption
         }
       }
     }
@@ -186,6 +228,14 @@ final GoRouter appRouter = GoRouter(
         mobileScaffold: MobileScaffold(),
         tabletScaffold: TabletScaffold(),
         desktopScaffold: const DesktopScaffold(body: TablesPage()),
+      ),
+    ),
+    GoRoute(
+      path: '/global-stats',
+      builder: (context, state) => ResponsiveLayout(
+        mobileScaffold: MobileScaffold(),
+        tabletScaffold: TabletScaffold(),
+        desktopScaffold: const DesktopScaffold(body: GlobalSalesStatsPage()),
       ),
     ),
   ],

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:responsive_app/configure/app_text_styles.dart';
 import 'package:responsive_app/models/table.dart';
 import 'package:responsive_app/services/table_service.dart';
+import 'package:responsive_app/services/restaurant_service.dart';
 
 class FloorPlanPage extends StatefulWidget {
   const FloorPlanPage({super.key});
@@ -25,7 +26,11 @@ class _FloorPlanPageState extends State<FloorPlanPage> {
 
   Future<void> _loadTables() async {
     try {
-      final tables = await _tableService.getTables();
+      final restaurantService = RestaurantService();
+      final restaurants = await restaurantService.getRestaurants();
+      String? restaurantId = restaurants.isNotEmpty ? restaurants.first.id : null;
+      
+      final tables = await _tableService.getTables(restaurantId: restaurantId);
       if (mounted) {
         setState(() {
           _tables = tables;

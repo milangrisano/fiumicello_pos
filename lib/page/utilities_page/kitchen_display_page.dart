@@ -169,9 +169,7 @@ class _KitchenDisplayPageState extends State<KitchenDisplayPage> {
 
   Widget _buildTicketCard(SaleModel sale, String? nextState, bool isDark, ColorScheme colorScheme) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final isChef = authProvider.currentUser?.roles.contains('Chef') ?? false;
-    final isSuperAdmin = authProvider.currentUser?.roles.contains('Super Admin') ?? false;
-    final canAction = isChef || isSuperAdmin;
+    final canAction = authProvider.currentUser?.hasPermission('kitchen:edit') ?? false;
     
     // Calcula tiempo desde la orden
     final duration = DateTime.now().difference(sale.createdAt);

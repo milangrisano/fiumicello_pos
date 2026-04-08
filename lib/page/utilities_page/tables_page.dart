@@ -14,8 +14,10 @@ class TablesPage extends StatefulWidget {
 
 class _TablesPageState extends State<TablesPage> {
   final TableService _tableService = TableService();
+  final RestaurantService _restaurantService = RestaurantService();
 
   List<TableModel> _tables = [];
+  List<dynamic> _restaurants = []; // Store restaurants
   bool _isLoading = true;
   String? _restaurantId;
 
@@ -25,23 +27,38 @@ class _TablesPageState extends State<TablesPage> {
   @override
   void initState() {
     super.initState();
-    _loadData();
+    _loadInitialData();
   }
 
-  Future<void> _loadData() async {
+  Future<void> _loadInitialData() async {
     try {
       setState(() => _isLoading = true);
-      
-      // We will just use the first available restaurant for simplicity, 
-      // or no restaurant if none available (though backend might require it).
-      // Future improvement: Add a dropdown to select the restaurant workspace.
-      final restaurantService = RestaurantService();
-      final restaurants = await restaurantService.getRestaurants();
-      if (restaurants.isNotEmpty) {
-        _restaurantId = restaurants.first.id;
+      final restaurants = await _restaurantService.getRestaurants();
+      if (mounted) {
+        setState(() {
+          _restaurants = restaurants;
+          if (restaurants.isNotEmpty) {
+            _restaurantId = restaurants.first.id;
+          }
+        });
+        if (_restaurantId != null) {
+          await _loadTablesForRestaurant(_restaurantId!);
+        } else {
+          setState(() => _isLoading = false);
+        }
       }
-      
-      final tables = await _tableService.getTables();
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al cargar restaurantes: $e')));
+      }
+    }
+  }
+
+  Future<void> _loadTablesForRestaurant(String rId) async {
+    try {
+      setState(() => _isLoading = true);
+      final tables = await _tableService.getTables(restaurantId: rId);
       
       if (mounted) {
         setState(() {
@@ -130,7 +147,11 @@ class _TablesPageState extends State<TablesPage> {
           await _tableService.updateTable(table.id, offset.dx, offset.dy);
         }
       }
-      await _loadData();
+      
+      if (_restaurantId != null) {
+        await _loadTablesForRestaurant(_restaurantId!);
+      }
+      
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Plano guardado exitosamente.')));
       }
@@ -154,6 +175,31 @@ class _TablesPageState extends State<TablesPage> {
           onPressed: () => context.go('/utilities'),
         ),
         actions: [
+          if (_restaurants.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: _restaurantId,
+                  icon: const Icon(Icons.restaurant_menu),
+                  style: AppTextStyles.bold(color: colorScheme.onSurface),
+                  onChanged: (String? newValue) {
+                    if (newValue != null && newValue != _restaurantId) {
+                      setState(() {
+                        _restaurantId = newValue;
+                      });
+                      _loadTablesForRestaurant(newValue);
+                    }
+                  },
+                  items: _restaurants.map<DropdownMenuItem<String>>((dynamic r) {
+                    return DropdownMenuItem<String>(
+                      value: r.id.toString(),
+                      child: Text(r.name),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
           TextButton.icon(
             onPressed: _isLoading ? null : _saveLayout,
             icon: const Icon(Icons.save),
@@ -182,13 +228,19 @@ class _TablesPageState extends State<TablesPage> {
                     child: GestureDetector(
                       onPanUpdate: (details) {
                         setState(() {
-                          // Snapping to grid 20x20
-                          final dx = (pos.dx + details.delta.dx);
-                          final dy = (pos.dy + details.delta.dy);
-                          // Magnetic snapping for visual cleanliness
-                          final snappedDx = (dx / 20).round() * 20.0;
-                          final snappedDy = (dy / 20).round() * 20.0;
-
+                          final currentPos = _dragOffsets[table.id]!;
+                          final dx = currentPos.dx + details.delta.dx;
+                          final dy = currentPos.dy + details.delta.dy;
+                          _dragOffsets[table.id] = Offset(
+                              dx.clamp(0.0, MediaQuery.of(context).size.width - 100),
+                              dy.clamp(0.0, MediaQuery.of(context).size.height - 100));
+                        });
+                      },
+                      onPanEnd: (details) {
+                        setState(() {
+                          final currentPos = _dragOffsets[table.id]!;
+                          final snappedDx = (currentPos.dx / 20).round() * 20.0;
+                          final snappedDy = (currentPos.dy / 20).round() * 20.0;
                           _dragOffsets[table.id] = Offset(
                               snappedDx.clamp(0.0, MediaQuery.of(context).size.width - 100),
                               snappedDy.clamp(0.0, MediaQuery.of(context).size.height - 100));

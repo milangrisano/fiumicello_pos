@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_app/configure/app_text_styles.dart';
 import 'package:responsive_app/page/sales_pages/widget_pos/pos_user_menu.dart';
+import 'package:responsive_app/provider/auth_provider.dart';
 
 class UtilitiesPage extends StatelessWidget {
   const UtilitiesPage({super.key});
@@ -11,18 +12,28 @@ class UtilitiesPage extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final List<Map<String, dynamic>> utilityItems = [
-      {'title': 'Roles', 'icon': Icons.admin_panel_settings, 'path': '/roles'},
-      {'title': 'Restaurants', 'icon': Icons.restaurant, 'path': '/restaurants'},
-      {'title': 'Terminal', 'icon': Icons.point_of_sale, 'path': '/terminals'},
-      {'title': 'Categorías', 'icon': Icons.category, 'path': '/categories'},
-      {'title': 'Payment Method', 'icon': Icons.credit_card, 'path': '/payment-methods'},
-      {'title': 'Sales', 'icon': Icons.receipt_long, 'path': '/sales-history'},
-      {'title': 'Products', 'icon': Icons.inventory, 'path': '/products'},
-      {'title': 'Users', 'icon': Icons.manage_accounts, 'path': '/users'},
-      {'title': 'Cocina', 'icon': Icons.kitchen, 'path': '/kitchen'},
-      {'title': 'Mesas', 'icon': Icons.table_restaurant, 'path': '/tables'},
+    final user = AuthProvider.instance.currentUser;
+    final hasGlobalAccess = user?.hasPermission('utilities:access') ?? false;
+
+    final List<Map<String, dynamic>> utilityItemsRaw = [
+      {'title': 'Roles', 'icon': Icons.admin_panel_settings, 'path': '/roles', 'permission': 'utilities:roles'},
+      {'title': 'Restaurants', 'icon': Icons.restaurant, 'path': '/restaurants', 'permission': 'utilities:restaurants'},
+      {'title': 'Terminal', 'icon': Icons.point_of_sale, 'path': '/terminals', 'permission': 'utilities:terminals'},
+      {'title': 'Categorías', 'icon': Icons.category, 'path': '/categories', 'permission': 'utilities:categories'},
+      {'title': 'Payment Method', 'icon': Icons.credit_card, 'path': '/payment-methods', 'permission': 'utilities:payment_methods'},
+      {'title': 'Products', 'icon': Icons.inventory, 'path': '/products', 'permission': 'utilities:products'},
+      {'title': 'Users', 'icon': Icons.manage_accounts, 'path': '/users', 'permission': 'utilities:users'},
+      {'title': 'Sales', 'icon': Icons.receipt_long, 'path': '/sales-history', 'permission': 'sales:view_history'},
+      {'title': 'Cocina', 'icon': Icons.kitchen, 'path': '/kitchen', 'permission': 'kitchen:view'},
+      {'title': 'Mesas', 'icon': Icons.table_restaurant, 'path': '/tables', 'permission': 'tables:manage'},
+      {'title': 'Global Stats', 'icon': Icons.bar_chart, 'path': '/global-stats', 'permission': 'utilities:access'},
     ];
+
+    final utilityItems = utilityItemsRaw.where((item) {
+      if (item['permission'] == null) return true;
+      if (hasGlobalAccess && item['permission']!.startsWith('utilities:')) return true;
+      return user?.hasPermission(item['permission'] as String) ?? false;
+    }).toList();
 
     return Scaffold(
       backgroundColor: Colors.transparent, // Deja ver el DesktopScaffold u otro fondo
@@ -69,25 +80,7 @@ class UtilitiesPage extends StatelessWidget {
 
                   return InkWell(
                     onTap: () {
-                      final allowedPaths = [
-                        '/roles', 
-                        '/users', 
-                        '/payment-methods', 
-                        '/products', 
-                        '/restaurants', 
-                        '/terminals', 
-                        '/categories',
-                        '/sales-history',
-                        '/kitchen',
-                        '/tables',
-                      ];
-                      if (allowedPaths.contains(item['path'])) {
-                        context.go(item['path']);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Configuración para ${item['title']} - En construcción')),
-                        );
-                      }
+                      context.go(item['path']);
                     },
                     borderRadius: BorderRadius.circular(16),
                     child: Container(
