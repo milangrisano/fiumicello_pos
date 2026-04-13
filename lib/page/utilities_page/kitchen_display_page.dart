@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_app/page/sales_pages/widget_pos/pos_user_menu.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:responsive_app/configure/api_config.dart';
 import 'package:responsive_app/configure/app_text_styles.dart';
@@ -113,6 +114,10 @@ class _KitchenDisplayPageState extends State<KitchenDisplayPage> {
           icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
           onPressed: () => context.go('/utilities'),
         ),
+        actions: [Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: PosUserMenu(isRightSide: true),
+        )],
       ),
       body: _isLoading 
         ? const Center(child: CircularProgressIndicator())

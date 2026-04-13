@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_app/configure/app_text_styles.dart';
 import 'package:responsive_app/models/table.dart';
+import 'package:responsive_app/page/sales_pages/widget_pos/pos_user_menu.dart';
 import 'package:responsive_app/services/table_service.dart';
 import 'package:responsive_app/services/restaurant_service.dart';
 
@@ -88,7 +89,8 @@ class _FloorPlanPageState extends State<FloorPlanPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Selección de Mesa / Orden', style: AppTextStyles.bold()),
+        title: Text('Selección de Mesa / Orden', style: AppTextStyles.bold(color: Colors.black)),
+        leading: PosUserMenu(),
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
