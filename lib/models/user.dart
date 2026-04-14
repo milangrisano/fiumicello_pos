@@ -45,7 +45,16 @@ class User {
           userRoles.add(json['role']['name'].toString());
         }
         if (json['role']['permissions'] != null) {
-           userPermissions = List<String>.from(json['role']['permissions']);
+          if (json['role']['permissions'] is List) {
+            userPermissions = List<String>.from(json['role']['permissions']);
+          } else if (json['role']['permissions'] is String) {
+            // Case for simple-array if it somehow comes as a raw string
+            userPermissions = (json['role']['permissions'] as String)
+                .split(',')
+                .map((e) => e.trim())
+                .where((e) => e.isNotEmpty)
+                .toList();
+          }
         }
       } else if (json['role'] is String) {
         userRoles.add(json['role'].toString());
@@ -54,11 +63,29 @@ class User {
       final rolesList = json['roles'] as List<dynamic>?;
       if (rolesList != null) {
         userRoles = rolesList.map((e) {
-          if (e is Map && e['name'] != null) return e['name'].toString();
+          if (e is Map && e['name'] != null) {
+            // If permissions are inside one of the roles, we collect them too
+            if (e['permissions'] != null) {
+              if (e['permissions'] is List) {
+                userPermissions.addAll(List<String>.from(e['permissions']));
+              } else if (e['permissions'] is String) {
+                userPermissions.addAll(e['permissions']
+                    .toString()
+                    .split(',')
+                    .map((p) => p.trim())
+                    .where((p) => p.isNotEmpty));
+              }
+            }
+            return e['name'].toString();
+          }
           return e.toString();
         }).toList();
       }
     }
+
+    // Ensure uniqueness in permissions
+    userPermissions = userPermissions.toSet().toList();
+
 
     return User(
       id: json['id'] as String? ?? '',

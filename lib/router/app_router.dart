@@ -57,6 +57,15 @@ final GoRouter appRouter = GoRouter(
         if (currentPath == '/kitchen' && !user.hasPermission('kitchen:view')) {
           return '/sales'; // Fallback to sales
         }
+
+        // Sales access
+        if (currentPath == '/sales' && 
+            !user.hasPermission('sales:manage') && 
+            !user.hasPermission('tables:view') && 
+            !user.hasPermission('sales:manage_active_payments')) {
+          if (user.hasPermission('kitchen:view')) return '/kitchen';
+          return '/'; // Go home if no access
+        }
         
         // Utilities access
         if (currentPath.startsWith('/utilities') || 
@@ -85,15 +94,24 @@ final GoRouter appRouter = GoRouter(
           return '/sales';
         }
         
-        // Sales routing logic
+        // Sales routing logic (landing after login or manual / access)
         if (currentPath == '/' || currentPath == '/guest') {
-          // Si el usuario tiene acceso a Ventas, que vaya a Ventas. Si no, pero a Kitchen sí, redirigir a Kitchen.
-          if (user.hasPermission('sales:manage') || user.hasPermission('tables:view') || user.hasPermission('sales:manage_active_payments')) {
+          // Prioritize Sales Management for Waiters/Managers/Admins
+          if (user.hasPermission('sales:manage') || user.hasPermission('sales:manage_active_payments')) {
              return '/sales';
-          } else if (user.hasPermission('kitchen:view')) {
+          } 
+          
+          // Prioritize Kitchen for Chefs/Cooks (even if they have read-only tables:view)
+          if (user.hasPermission('kitchen:view')) {
              return '/kitchen';
           }
-          return '/sales'; // Default assumption
+
+          // Fallback to Sales for users with only tables:view
+          if (user.hasPermission('tables:view')) {
+             return '/sales';
+          }
+
+          return '/sales'; // Default assumption for other authenticated users
         }
       }
     }
