@@ -154,6 +154,8 @@ class AuthProvider extends ChangeNotifier {
           isActive: _currentUser!.isActive,
           isEmailVerified: true,
           roles: _currentUser!.roles,
+          permissions: _currentUser!.permissions,
+          defaultRoute: _currentUser!.defaultRoute,
         );
         await _persistSession();
       }

@@ -4,6 +4,7 @@ class RoleDefinitionModel {
   final String description;
   bool isActive;
   List<String> permissions;
+  String? defaultRoute;
 
   RoleDefinitionModel({
     required this.id,
@@ -11,6 +12,7 @@ class RoleDefinitionModel {
     required this.description,
     required this.isActive,
     required this.permissions,
+    this.defaultRoute,
   });
 
   factory RoleDefinitionModel.fromJson(Map<String, dynamic> json) {
@@ -22,6 +24,7 @@ class RoleDefinitionModel {
       permissions: json['permissions'] != null 
           ? List<String>.from(json['permissions']) 
           : [],
+      defaultRoute: json['defaultRoute'] as String?,
     );
   }
 
@@ -32,6 +35,7 @@ class RoleDefinitionModel {
       'description': description,
       'isActive': isActive,
       'permissions': permissions,
+      'defaultRoute': defaultRoute,
     };
   }
 }

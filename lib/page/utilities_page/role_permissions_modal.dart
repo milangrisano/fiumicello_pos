@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:responsive_app/configure/app_text_styles.dart';
 import 'package:responsive_app/models/role.dart';
 import 'package:responsive_app/services/role_service.dart';
+import 'package:responsive_app/provider/auth_provider.dart';
 
 class RolePermissionsModal extends StatefulWidget {
   final RoleDefinitionModel role;
-  final Function(List<String>) onSaved;
+  final Function(List<String>, String?) onSaved;
 
   const RolePermissionsModal({
     super.key,
@@ -21,6 +22,7 @@ class _RolePermissionsModalState extends State<RolePermissionsModal> {
   final RoleService _roleService = RoleService();
   bool _isSaving = false;
   late Set<String> _selectedPermissions;
+  String? _selectedDefaultRoute;
 
   final Map<String, List<Map<String, String>>> _permissionModules = {
     'Módulo de Utilidad Global': [
@@ -48,14 +50,30 @@ class _RolePermissionsModalState extends State<RolePermissionsModal> {
     ],
   };
 
+  final List<Map<String, String>> _availableRoutes = [
+    {'path': '/utilities', 'label': 'Configuración y Utilidades'},
+    {'path': '/sales', 'label': 'Punto de Venta / Mesas'},
+    {'path': '/kitchen', 'label': 'Pantalla de Cocina'},
+    {'path': '/guest', 'label': 'Pantalla de Invitado'},
+  ];
+
   @override
   void initState() {
     super.initState();
     _selectedPermissions = Set<String>.from(widget.role.permissions);
+    _selectedDefaultRoute = widget.role.defaultRoute;
+  }
+
+  bool _canEditRoles() {
+    final currentUser = AuthProvider.instance.currentUser;
+    if (currentUser == null) return false;
+    return currentUser.roles.contains('Super Admin') || currentUser.roles.contains('Admin');
   }
 
   void _togglePermission(String key) {
     if (widget.role.name == 'Super Admin') return; // Cannot edit super admin
+    if (!_canEditRoles()) return;
+    
     setState(() {
       if (_selectedPermissions.contains(key)) {
         _selectedPermissions.remove(key);
@@ -72,8 +90,8 @@ class _RolePermissionsModalState extends State<RolePermissionsModal> {
 
     try {
       final permList = _selectedPermissions.toList();
-      await _roleService.updateRolePermissions(widget.role.id, permList);
-      widget.onSaved(permList);
+      await _roleService.updateRolePermissions(widget.role.id, permList, defaultRoute: _selectedDefaultRoute);
+      widget.onSaved(permList, _selectedDefaultRoute);
       navigator.pop();
     } catch (e) {
       if (mounted) {
@@ -89,7 +107,8 @@ class _RolePermissionsModalState extends State<RolePermissionsModal> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isSuperAdmin = widget.role.name == 'Super Admin';
+    final isSuperAdminRole = widget.role.name == 'Super Admin';
+    final canEdit = _canEditRoles() && !isSuperAdminRole;
 
     return AlertDialog(
       title: Row(
@@ -106,8 +125,9 @@ class _RolePermissionsModalState extends State<RolePermissionsModal> {
         width: 800,
         height: 600,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (isSuperAdmin)
+            if (isSuperAdminRole)
               Container(
                 margin: const EdgeInsets.only(bottom: 16),
                 padding: const EdgeInsets.all(12),
@@ -129,6 +149,75 @@ class _RolePermissionsModalState extends State<RolePermissionsModal> {
                   ],
                 ),
               ),
+              
+            if (!_canEditRoles())
+              Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: colorScheme.errorContainer,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: colorScheme.error),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.lock, color: colorScheme.onErrorContainer),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'No tienes permisos suficientes (Super Admin o Admin) para modificar roles.',
+                        style: AppTextStyles.text(color: colorScheme.onErrorContainer),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+            // Dropdown para Pantalla de Inicio (Landing Page)
+            Card(
+              margin: const EdgeInsets.only(bottom: 16),
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(color: isDark ? colorScheme.outlineVariant : Colors.black12),
+              ),
+              color: isDark ? colorScheme.surfaceTint.withValues(alpha: 0.05) : Colors.blue.withValues(alpha: 0.05),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    Icon(Icons.home, color: colorScheme.primary),
+                    const SizedBox(width: 16),
+                    Text('Pantalla de Inicio:', style: AppTextStyles.bold(color: colorScheme.onSurface)),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          isExpanded: true,
+                          value: _selectedDefaultRoute,
+                          hint: Text('Selecciona una ruta...', style: AppTextStyles.text(color: colorScheme.onSurfaceVariant)),
+                          items: _availableRoutes.map((route) {
+                            return DropdownMenuItem<String>(
+                              value: route['path'],
+                              child: Text(route['label']!, style: AppTextStyles.text()),
+                            );
+                          }).toList(),
+                          onChanged: canEdit ? (String? newValue) {
+                            setState(() {
+                              _selectedDefaultRoute = newValue;
+                            });
+                          } : null,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            
+            const Divider(),
+            const SizedBox(height: 8),
+            
             Expanded(
               child: ListView.builder(
                 itemCount: _permissionModules.length,
@@ -170,7 +259,7 @@ class _RolePermissionsModalState extends State<RolePermissionsModal> {
                                     style: AppTextStyles.w500(color: colorScheme.onSurface),
                                   ),
                                   value: isSelected,
-                                  onChanged: isSuperAdmin ? null : (bool? value) => _togglePermission(key),
+                                  onChanged: canEdit ? (bool? value) => _togglePermission(key) : null,
                                   activeColor: colorScheme.primary,
                                 ),
                               );
@@ -189,9 +278,9 @@ class _RolePermissionsModalState extends State<RolePermissionsModal> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text('Cancelar', style: AppTextStyles.bold(color: colorScheme.onSurfaceVariant)),
+          child: Text(canEdit ? 'Cancelar' : 'Cerrar', style: AppTextStyles.bold(color: colorScheme.onSurfaceVariant)),
         ),
-        if (!isSuperAdmin)
+        if (canEdit)
           ElevatedButton(
             onPressed: _isSaving ? null : _savePermissions,
             style: ElevatedButton.styleFrom(

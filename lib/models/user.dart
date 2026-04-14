@@ -6,6 +6,7 @@ class User {
   final bool isEmailVerified;
   final List<String> roles;
   final List<String> permissions;
+  final String? defaultRoute;
 
   User({
     required this.id,
@@ -15,6 +16,7 @@ class User {
     this.isEmailVerified = false,
     this.roles = const [],
     this.permissions = const [],
+    this.defaultRoute,
   });
 
   bool get isGuestUser {
@@ -38,6 +40,7 @@ class User {
     // Manejar el formato de un único role
     List<String> userRoles = [];
     List<String> userPermissions = [];
+    String? userDefaultRoute;
     
     if (json['role'] != null) {
       if (json['role'] is Map) {
@@ -55,6 +58,9 @@ class User {
                 .where((e) => e.isNotEmpty)
                 .toList();
           }
+        }
+        if (json['role']['defaultRoute'] != null) {
+           userDefaultRoute = json['role']['defaultRoute'] as String?;
         }
       } else if (json['role'] is String) {
         userRoles.add(json['role'].toString());
@@ -83,9 +89,16 @@ class User {
       }
     }
 
+    // El endpoint de login devuelve los permisos/defaultRoute en la raíz del payload a veces
+    if (json['permissions'] != null && userPermissions.isEmpty) {
+        userPermissions = List<String>.from(json['permissions']);
+    }
+    if (json['defaultRoute'] != null && userDefaultRoute == null) {
+        userDefaultRoute = json['defaultRoute'] as String?;
+    }
+
     // Ensure uniqueness in permissions
     userPermissions = userPermissions.toSet().toList();
-
 
     return User(
       id: json['id'] as String? ?? '',
@@ -95,6 +108,7 @@ class User {
       isEmailVerified: json['isEmailVerified'] ?? false,
       roles: userRoles,
       permissions: userPermissions,
+      defaultRoute: userDefaultRoute,
     );
   }
 
@@ -107,6 +121,7 @@ class User {
       'isEmailVerified': isEmailVerified,
       'roles': roles,
       'permissions': permissions,
+      'defaultRoute': defaultRoute,
     };
   }
 }

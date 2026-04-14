@@ -51,11 +51,27 @@ final GoRouter appRouter = GoRouter(
           return '/guest';
         }
       } else {
-        // Validaciones finas por permisos
+        // Enrutamiento Inicial: Redireccionar a la pantalla por defecto del rol cuando recién hace login ('/')
+        if (currentPath == '/' || currentPath == '/guest') {
+           if (user.defaultRoute != null && user.defaultRoute!.isNotEmpty) {
+               return user.defaultRoute;
+           }
+           // Fallbacks si no tiene defaultRoute configurado
+           if (user.hasPermission('sales:manage') || user.hasPermission('tables:view') || user.hasPermission('sales:manage_active_payments')) {
+             return '/sales';
+           } else if (user.hasPermission('kitchen:view')) {
+             return '/kitchen';
+           } else if (user.hasPermission('utilities:access')) {
+             return '/utilities';
+           }
+           return '/sales';
+        }
+
+        // Validaciones finas por permisos para prevenir acceso manual por URL
         
         // Kitchen access
         if (currentPath == '/kitchen' && !user.hasPermission('kitchen:view')) {
-          return '/sales'; // Fallback to sales
+          return user.defaultRoute ?? '/sales';
         }
 
         // Sales access
@@ -67,7 +83,7 @@ final GoRouter appRouter = GoRouter(
           return '/'; // Go home if no access
         }
         
-        // Utilities access
+        // Utilities access (Panel Principal)
         if (currentPath.startsWith('/utilities') || 
             currentPath == '/roles' || 
             currentPath == '/users' || 
@@ -78,40 +94,27 @@ final GoRouter appRouter = GoRouter(
             currentPath == '/categories' ||
             currentPath == '/sales-history' ||
             currentPath == '/global-stats') {
-          // If they try to enter utilities without any access
+          
           if (!user.hasPermission('utilities:access') && 
               !user.hasPermission('sales:view_history') && 
               !user.hasPermission('tables:manage')) {
-            // First allowed fallback is Kitchen if they only have kitchen view
-            if (user.hasPermission('kitchen:view')) return '/kitchen';
-            return '/sales'; 
+             return user.defaultRoute ?? '/sales';
           }
+          
+          // Rutas específicas dentro de utilities
+          if (currentPath == '/roles' && !user.hasPermission('utilities:roles')) return '/utilities';
+          if (currentPath == '/users' && !user.hasPermission('utilities:users')) return '/utilities';
+          if (currentPath == '/products' && !user.hasPermission('utilities:products')) return '/utilities';
+          if (currentPath == '/categories' && !user.hasPermission('utilities:categories')) return '/utilities';
+          if (currentPath == '/payment-methods' && !user.hasPermission('utilities:payment_methods')) return '/utilities';
+          if (currentPath == '/restaurants' && !user.hasPermission('utilities:restaurants')) return '/utilities';
+          if (currentPath == '/terminals' && !user.hasPermission('utilities:terminals')) return '/utilities';
+          if ((currentPath == '/sales-history' || currentPath == '/global-stats') && !user.hasPermission('sales:view_history')) return '/utilities';
         }
         
         // Tables manage
-        if (currentPath == '/tables' && !user.hasPermission('tables:manage')) {
-          if (user.hasPermission('kitchen:view')) return '/kitchen';
-          return '/sales';
-        }
-        
-        // Sales routing logic (landing after login or manual / access)
-        if (currentPath == '/' || currentPath == '/guest') {
-          // Prioritize Sales Management for Waiters/Managers/Admins
-          if (user.hasPermission('sales:manage') || user.hasPermission('sales:manage_active_payments')) {
-             return '/sales';
-          } 
-          
-          // Prioritize Kitchen for Chefs/Cooks (even if they have read-only tables:view)
-          if (user.hasPermission('kitchen:view')) {
-             return '/kitchen';
-          }
-
-          // Fallback to Sales for users with only tables:view
-          if (user.hasPermission('tables:view')) {
-             return '/sales';
-          }
-
-          return '/sales'; // Default assumption for other authenticated users
+        if (currentPath == '/tables' && !user.hasPermission('tables:manage') && !user.hasPermission('tables:view')) {
+           return user.defaultRoute ?? '/sales';
         }
       }
     }

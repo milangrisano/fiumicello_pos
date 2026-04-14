@@ -244,9 +244,10 @@ class _RolesPageState extends State<RolesPage> {
                                     context: context,
                                     builder: (context) => RolePermissionsModal(
                                       role: role,
-                                      onSaved: (newPermissions) {
+                                      onSaved: (newPermissions, newDefaultRoute) {
                                         setState(() {
                                           role.permissions = newPermissions;
+                                          role.defaultRoute = newDefaultRoute;
                                         });
                                       },
                                     ),

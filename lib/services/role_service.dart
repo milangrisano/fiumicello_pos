@@ -64,15 +64,20 @@ class RoleService {
     }
   }
 
-  Future<void> updateRolePermissions(String id, List<String> permissions) async {
+  Future<void> updateRolePermissions(String id, List<String> permissions, {String? defaultRoute}) async {
     try {
       final headers = await ApiConfig.getHeaders(requireAuth: true);
+      final bodyData = {
+        'permissions': permissions,
+      };
+      if (defaultRoute != null) {
+        bodyData['defaultRoute'] = defaultRoute;
+      }
+      
       final response = await http.patch(
         Uri.parse('${ApiConfig.baseUrl}/roles/$id/permissions'),
         headers: headers,
-        body: json.encode({
-          'permissions': permissions,
-        }),
+        body: json.encode(bodyData),
       );
 
       if (response.statusCode != 200) {
