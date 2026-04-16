@@ -75,7 +75,7 @@ class RoleService {
       }
       
       final response = await http.patch(
-        Uri.parse('${ApiConfig.baseUrl}/roles/$id/permissions'),
+        Uri.parse('${ApiConfig.baseUrl}/roles/$id'),
         headers: headers,
         body: json.encode(bodyData),
       );
